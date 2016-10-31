@@ -25,7 +25,7 @@ public class MentorCmd {
         			mentor.stop();
         		else if ("start".equalsIgnoreCase(line))
         			mentor.start();
-        		else if ("quit".equalsIgnoreCase(line) || "q".equalsIgnoreCase(line))
+        		else if ("quit".equalsIgnoreCase(line) || "q".equalsIgnoreCase(line) || line == null)
         			break;
         	}   
 		} catch (IOException e) {
