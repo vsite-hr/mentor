@@ -1,0 +1,110 @@
+import org.apache.tools.ant.filters.*
+
+plugins {
+	id 'java'
+	id 'application'
+	id 'eclipse'
+}
+
+sourceCompatibility = 1.8
+version = '0.0.0-pre'
+mainClassName = 'hr.vsite.mentor.MentorCmd'
+
+run {
+	classpath += files("${System.env.MENTOR_CONF}", System.properties['MENTOR_CONF'], "build/conf/main")
+	standardInput = System.in
+}
+
+startScripts {
+	doLast {
+		unixScript.text = unixScript.text.replace('CLASSPATH=', 'CLASSPATH=$MENTOR_CONF:$APP_HOME/conf:') 
+		windowsScript.text = windowsScript.text.replace('set CLASSPATH=', 'set CLASSPATH=%MENTOR_CONF%;%APP_HOME%\\conf;')
+	}
+}
+
+repositories {
+    jcenter()
+}
+
+configurations {
+	provided
+}
+
+dependencies {
+
+	compile	'ch.qos.logback:logback-core:1.1.7',
+			'ch.qos.logback:logback-classic:1.1.7',
+			'org.slf4j:slf4j-api:1.7.21',
+			'org.apache.commons:commons-lang3:3.5',
+			'org.apache.commons:commons-dbcp2:2.1.1',
+			'commons-configuration:commons-configuration:1.10',
+			'commons-collections:commons-collections:3.2.2',	// optional, but needed, for XML support in commons-configuration
+			'commons-daemon:commons-daemon:1.0.15',
+			'com.google.inject:guice:4.1.0',
+			'com.google.inject.extensions:guice-servlet:4.1.0',
+			'com.google.guava:guava:20.0',
+			'org.quartz-scheduler:quartz:2.2.3',
+			'org.eclipse.jetty.aggregate:jetty-all:9.3.13.v20161014',
+			'org.jboss.resteasy:resteasy-jaxrs-all:3.0.19.Final',
+			'org.jboss.resteasy:resteasy-servlet-initializer:3.0.19.Final',
+			'org.jboss.resteasy:resteasy-guice:3.0.19.Final',
+			'org.jboss.resteasy:resteasy-jackson2-provider:3.0.19.Final',
+			'com.fasterxml.jackson.core:jackson-core:2.8.4',
+			'com.fasterxml.jackson.core:jackson-databind:2.8.4',
+			'com.fasterxml.jackson.core:jackson-annotations:2.8.4',
+			'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4'
+
+	runtime	'org.postgresql:postgresql:9.4.1211.jre7'
+
+	provided 'javax.servlet:javax.servlet-api:3.1.0'
+
+}
+
+distributions {
+	main {
+		contents {
+			
+			exclude('conf/jdbc.properties')
+			rename('jdbc.template.properties', 'jdbc.properties')
+			
+			exclude('conf/jetty.xml')
+			rename('jetty.template.xml', 'jetty.xml')
+			
+			exclude('conf/logback.xml')
+			rename('logback.template.xml', 'logback.xml')
+			
+			exclude('conf/mentor.xml')
+			rename('mentor.template.xml', 'mentor.xml')
+			
+		}
+	}
+}
+
+processResources {
+    filter ReplaceTokens, tokens: ['version': project.version]
+}
+
+task processConf(type: Copy) {
+    from('src/main/dist/conf') {
+        include 'jdbc.properties'
+        include 'jetty.xml'
+        include 'logback.xml'
+        include 'mentor.xml'
+    }
+    into 'build/conf/main'
+}
+
+task processWar(type: Copy) {
+    from('src/main/dist/war') {
+        include '**/*'
+    }
+    into 'build/war/main'
+}
+
+classes {
+    classes.dependsOn processConf, processWar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+}

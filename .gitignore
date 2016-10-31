@@ -1,0 +1,16 @@
+.gradle/
+.classpath
+.metadata
+.project
+.settings
+bin/
+build/
+conf/
+db/psql/db.config
+src/main/dist/conf/mentor.xml
+src/main/dist/conf/jdbc.properties
+src/main/dist/conf/jetty.xml
+src/main/dist/conf/logback.xml
+work/
+gradle.properties
+gradle-app.setting
