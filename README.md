@@ -12,6 +12,4 @@ Incubating.
 
 [Run](https://github.com/vsite-hr/hive/mentor/Run)
 
-[Install](https://github.com/vsite-hr/hive/mentor/Install)
-
 [Debug](https://github.com/vsite-hr/hive/mentor/Debug)
