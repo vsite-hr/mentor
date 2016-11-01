@@ -11,7 +11,7 @@ version = '0.0.0-pre'
 mainClassName = 'hr.vsite.mentor.MentorCmd'
 
 run {
-	classpath += files("${System.env.MENTOR_CONF}", System.properties['MENTOR_CONF'], "build/conf/main")
+	classpath += files("${System.env.MENTOR_CONF}", files("${System.properties.MENTOR_CONF}"), "build/conf/main")
 	standardInput = System.in
 }
 
