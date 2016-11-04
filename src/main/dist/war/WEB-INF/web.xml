@@ -22,7 +22,7 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- NOTE: do not configure servlets and filters here, but in hr.vsite.hive.services.jetty.rest.HiveServletModule -->
+	<!-- NOTE: do not configure servlets and filters here, but in hr.vsite.mentor.servlet.MentorServletModule -->
 
 	<session-config>
 		<session-timeout>10080</session-timeout>	<!--  minutes (10080 minutes == 168 hours == 7 days) -->
