@@ -1,16 +1,23 @@
 package hr.vsite.mentor.servlet.rest;
 
-import java.time.Instant;
-
 import javax.ws.rs.ext.ParamConverter;
 
 import com.google.inject.AbstractModule;
 
-import hr.vsite.mentor.servlet.rest.param.InstantParamConverter;
+import hr.vsite.mentor.course.Course;
+import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.servlet.rest.param.CourseParamConverter;
 import hr.vsite.mentor.servlet.rest.param.JaxRsParams;
+import hr.vsite.mentor.servlet.rest.param.LectureParamConverter;
+import hr.vsite.mentor.servlet.rest.param.UnitParamConverter;
+import hr.vsite.mentor.servlet.rest.param.UserParamConverter;
 import hr.vsite.mentor.servlet.rest.providers.GuiceParamConverterProvider;
 import hr.vsite.mentor.servlet.rest.providers.ObjectMapperProvider;
 import hr.vsite.mentor.servlet.rest.resources.RootResource;
+import hr.vsite.mentor.servlet.rest.resources.UnitResource;
+import hr.vsite.mentor.servlet.rest.resources.UserResource;
+import hr.vsite.mentor.unit.Unit;
+import hr.vsite.mentor.user.User;
 
 /**
  * Place to register all JAX-RS resources
@@ -25,10 +32,18 @@ public class ResourceModule extends AbstractModule {
 		bind(GuiceParamConverterProvider.class);
 		
 		// params
-		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Instant.class)).to(InstantParamConverter.class);
+		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(User.class)).to(UserParamConverter.class);
+		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(User.class)).to(UserParamConverter.class);
+		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Course.class)).to(CourseParamConverter.class);
+		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Lecture.class)).to(LectureParamConverter.class);
+		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Unit.class)).to(UnitParamConverter.class);
 		
 		// resources
 		bind(RootResource.class);
+		bind(UserResource.class);
+		// TODO CourseManager
+		// TODO LectureManager
+		bind(UnitResource.class);
 		
 	}
 

@@ -3,6 +3,9 @@ package hr.vsite.mentor;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import hr.vsite.mentor.db.JdbcModule;
+import hr.vsite.mentor.servlet.MentorServletModule;
+
 /**
  * Top level Guice Injector.
  */
@@ -16,8 +19,9 @@ public class MentorInjector {
 	
 	private MentorInjector() {
 		injector = Guice.createInjector(
-//			new DaoModule(),
-			new MentorModule()
+			new JdbcModule(),
+			new MentorModule(),
+			new MentorServletModule()
 		);
 	}
 

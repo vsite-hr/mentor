@@ -12,7 +12,7 @@ public class MentorGuiceServletContextListener extends GuiceServletContextListen
 
 	@Override
 	protected Injector getInjector() {
-		return MentorInjector.get().createChildInjector(new MentorServletModule());
+		return MentorInjector.get();
 	}
 
 }
