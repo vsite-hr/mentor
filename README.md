@@ -10,6 +10,6 @@ Incubating.
 
 ## Engage
 
-[Run](wiki/Run)
+[Run](https://github.com/vsite-hr/mentor/wiki/Run)
 
-[Debug](wiki/Debug)
+[Debug](https://github.com/vsite-hr/mentor/wiki/Debug)
