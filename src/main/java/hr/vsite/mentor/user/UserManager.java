@@ -99,7 +99,7 @@ public class UserManager {
 
 	}
 
-	/** Parses given ResulktSet and extract User from it.
+	/** Parses given ResultSet and extract User from it.
 	 * If ResultSet had <code>NULL</code> in <code>author_id</code> column, <code>null</code> is returned. */
 	public User fromResultSet(ResultSet resultSet) {
 		
