@@ -1,15 +1,16 @@
 package hr.vsite.mentor.course;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +27,15 @@ public class CourseManager {
 	/** Returns <code>Course</code> with corresponding id, or <code>null</code> if such course does not exist. */
 	public Course findById(UUID id) {
 
-		// TODO implement CourseManager.findById(UUID)
-		
-		throw new NotImplementedException("CourseManager.findById(UUID)");
-		
+		try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT * FROM courses WHERE course_id = ?")) {
+			statement.setObject(1, id);
+			try (ResultSet resultSet = statement.executeQuery()) {
+	        	return resultSet.next() ? fromResultSet(resultSet) : null;
+	        }
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to find course with id " + id, e);
+		}
+	
 	}
 	
 	/** Returns all courses known to application, unpaged. If there is a possibility for large number of courses,
@@ -47,10 +53,43 @@ public class CourseManager {
 	/** Returns courses that match given criteria, paged. */
 	public List<Course> list(CourseFilter filter, Integer count, Integer offset) {
 
-		// TODO implement CourseManager.list(CourseFilter, Integer, Integer)
+		List<Course> courses = new ArrayList<>(count != null ? count : 10);
 		
-		throw new NotImplementedException("CourseManager.list(CourseFilter, Integer, Integer)");
+		StringBuilder queryBuilder = new StringBuilder(1000);
+		queryBuilder.append("SELECT * FROM courses WHERE true");
+		if (filter.getTitle() != null)
+			queryBuilder.append(" AND lower(course_title) LIKE '%' || lower(?) || '%'");
+		if (filter.getDescription() != null)
+			queryBuilder.append(" AND lower(course_description) LIKE '%' || lower(?) || '%'");
+		if (filter.getAuthor() != null)
+			queryBuilder.append(" AND lower(author_id) = lower(?)");
+		if (count != null)
+			queryBuilder.append(" LIMIT ?");
+		if (offset != null)
+			queryBuilder.append(" OFFSET ?");
 		
+		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
+			int index = 0;
+			if (filter.getTitle() != null)
+			    statement.setString(++index, filter.getTitle());
+			if (filter.getDescription() != null)
+			    statement.setString(++index, filter.getDescription());
+			if (filter.getAuthor() != null)
+			    statement.setString(++index, String.class.cast(filter.getAuthor().getId()));
+			if (count != null)
+				statement.setInt(++index, count);
+			if (offset != null)
+				statement.setInt(++index, offset);
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	        	while(resultSet.next())
+	        		courses.add(fromResultSet(resultSet));
+	        }
+		} catch (SQLException e) {
+			throw new RuntimeException("Unable to list courses", e);
+		}
+		
+	    return courses;
+	    
 	}
 	
 	/** Parses given ResultSet and extract {@link Course} from it.
