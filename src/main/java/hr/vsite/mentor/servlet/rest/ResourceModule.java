@@ -16,6 +16,7 @@ import hr.vsite.mentor.servlet.rest.providers.ObjectMapperProvider;
 import hr.vsite.mentor.servlet.rest.resources.RootResource;
 import hr.vsite.mentor.servlet.rest.resources.UnitResource;
 import hr.vsite.mentor.servlet.rest.resources.UserResource;
+import hr.vsite.mentor.servlet.rest.resources.CourseResource;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.user.User;
 
@@ -41,7 +42,7 @@ public class ResourceModule extends AbstractModule {
 		// resources
 		bind(RootResource.class);
 		bind(UserResource.class);
-		// TODO CourseManager
+		bind(CourseResource.class);
 		// TODO LectureManager
 		bind(UnitResource.class);
 		
