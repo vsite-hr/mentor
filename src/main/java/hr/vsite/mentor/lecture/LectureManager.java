@@ -1,15 +1,15 @@
 package hr.vsite.mentor.lecture;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +26,15 @@ public class LectureManager {
 	/** Returns <code>Lecture</code> with corresponding id, or <code>null</code> if such lecture does not exist. */
 	public Lecture findById(UUID id) {
 
-		// TODO implement LectureManager.findById(UUID)
-		
-		throw new NotImplementedException("LectureManager.findById(UUID)");
-		
+		try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT * FROM lectures WHERE lecture_id = ?")) {
+		    statement.setObject(1, id);
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	        	return resultSet.next() ? lectureFromResultSet(resultSet) : null;
+	        }
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException("Unable to find lecture with id " + id, e.getCause());
+		}	
 	}
 	
 	/** Returns all lectures known to application, unpaged. If there is a possibility for large number of lectures,
@@ -47,31 +52,71 @@ public class LectureManager {
 	/** Returns lectures that match given criteria, paged. */
 	public List<Lecture> list(LectureFilter filter, Integer count, Integer offset) {
 		
-		// TODO implement LectureManager.list(LectureFilter, Integer, Integer)
+		List<Lecture> lectures = new ArrayList<>(count != null ? count : 10);
 		
-		throw new NotImplementedException("LectureManager.list(LectureFilter, Integer, Integer)");
+		StringBuilder queryBuilder = new StringBuilder(1000);
+		queryBuilder.append("SELECT l.* FROM lectures l WHERE true");		
+		try{
+			if(filter.getCourse() != null)
+				queryBuilder.replace(queryBuilder.indexOf("WHERE true"), 
+									 queryBuilder.length(), 
+									 ", course_lectures cl WHERE l.lecture_id = cl.lecture_id AND cl.course_id = ?");
+		}
+		catch(StringIndexOutOfBoundsException e){
+			throw new RuntimeException("queryBuilder.replace() index is out of bound", e.getCause());
+		}
+		if (filter.getTitle() != null)
+			queryBuilder.append(" AND lower(l.lecture_title) LIKE lower('%'||?||'%')");
+		if (filter.getAuthor() != null)
+			queryBuilder.append(" AND l.author_id = ?");
+		if (count != null)
+			queryBuilder.append("LIMIT ?");
+		if (offset != null)
+			queryBuilder.append("OFFSET ?");
+	    
+		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
+			int index = 0;
+			if (filter.getCourse() != null)
+			    statement.setObject(++index, filter.getCourse().getId());
+			if (filter.getTitle() != null)
+			    statement.setString(++index, filter.getTitle());
+			if (filter.getAuthor() != null)
+			    statement.setObject(++index, filter.getAuthor().getId());
+			if (count != null)
+				statement.setInt(++index, count);
+			if (offset != null)
+				statement.setInt(++index, offset);
+			
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	        	while(resultSet.next())
+	        		lectures.add(lectureFromResultSet(resultSet));
+	        }
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException("Unable to list lectures", e.getCause());
+		}
 		
+	    return lectures;	
 	}
 	
-	/** Parses given ResultSet and extract {@link Course} from it.
-	 * If ResultSet had <code>NULL</code> in <code>course_id</code> column, <code>null</code> is returned. */
+	/** Parses given ResultSet and extract {@link Lectures} from it.
+	 * If ResultSet had <code>NULL</code> in <code>Lectures_id</code> column, <code>null</code> is returned. */
 	public Lecture lectureFromResultSet(ResultSet resultSet) {
 		
 		Lecture lecture = new Lecture();
 		
 		try {
-			lecture.setId(UUID.class.cast(resultSet.getObject("course_id")));
+			lecture.setId(UUID.class.cast(resultSet.getObject("lecture_id")));
 			if (resultSet.wasNull())
 				return null;
-			lecture.setTitle(resultSet.getString("course_title"));
-			lecture.setDescription(resultSet.getString("course_description"));
-			lecture.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
-		} catch (SQLException e) {
-			throw new RuntimeException("Unable to resolve course from result set", e);
+			lecture.setTitle(resultSet.getString("lecture_title"));
+			lecture.setDescription(resultSet.getString("lecture_description"));
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException("Unable to resolve lectures from result set", e.getCause());
 		}
 		
 		return lecture;
-		
 	}
 	
 	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
