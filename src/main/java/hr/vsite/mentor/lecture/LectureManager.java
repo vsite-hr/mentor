@@ -59,15 +59,11 @@ public class LectureManager {
 		queryBuilder.append("SELECT l.* FROM lectures l WHERE true"); 
 		if(filter.getCourse() != null)
 			queryBuilder.append(" AND EXISTS (SELECT 1 FROM course_lectures cl WHERE l.lecture_id = cl.lecture_id AND cl.course_id = ?)");
-		queryBuilder.append(" AND EXISTS (SELECT 1 FROM course_lectures cl WHERE l.lecture_id = cl.lecture_id AND cl.course_id = ?)");
 		if (filter.getTitle() != null)
-		{
-			queryBuilder.append(" AND lower(l.lecture_title COLLATE \"").
-									append(Mentor.DefaultLocale.toString()).
-									append("\") LIKE lower('%'||?||'%' COLLATE \"").
-									append(Mentor.DefaultLocale.toString()).
-									append("\")");
-		} 
+			queryBuilder.append(" AND lower(l.lecture_title COLLATE \""+
+										Mentor.DefaultLocale.toString()+
+										"\") LIKE lower('%'||?||'%' COLLATE \""+
+										Mentor.DefaultLocale.toString()+"\")"); 
 		if (filter.getAuthor() != null)
 			queryBuilder.append(" AND l.author_id = ?");
 		if (count != null)
