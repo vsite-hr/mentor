@@ -31,10 +31,10 @@ public class CourseParamConverter implements ParamConverter<Course> {
 	}
 
 	@Override
-	public String toString(Course lecture) {
-		if (lecture == null)
+	public String toString(Course course) {
+		if (course == null)
 			return null;
-		return lecture.getId().toString();
+		return course.getId().toString();
 	}
 
 	private final Provider<CourseManager> courseProvider;
