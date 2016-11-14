@@ -1,18 +1,18 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.transaction.Transactional;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
 import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.course.CourseFilter;
 import hr.vsite.mentor.course.CourseManager;
@@ -57,6 +57,14 @@ public class CourseResource {
 
 		return course;
 
+	}
+	
+	@POST
+	@Path("insert")
+	@Transactional
+	@Consumes(MediaType.APPLICATION_JSON)
+	public void insert(Course course) {
+		courseProvider.get().insert(course);
 	}
 
 	private final Provider<CourseManager> courseProvider;
