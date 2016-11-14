@@ -1,7 +1,9 @@
 package hr.vsite.mentor;
 
 import java.io.InputStream;
+import java.util.Locale;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.quartz.Scheduler;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import hr.vsite.mentor.MentorInjector;
 
 public class Mentor {
+
+	public static final Locale DefaultLocale = LocaleUtils.toLocale("hr_HR");
 
 	public static Mentor get() {
 		if (instance == null)
