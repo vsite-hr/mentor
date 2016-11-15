@@ -1,12 +1,15 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
 import java.util.List;
+import java.util.UUID;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -59,12 +62,24 @@ public class CourseResource {
 
 	}
 	
-	@POST
-	@Path("insert")
+	@PUT
+	@Path("")
 	@Transactional
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void insert(Course course) {
-		courseProvider.get().insert(course);
+	@Produces(MediaType.APPLICATION_JSON)
+	public Course insert(Course course) {
+		return courseProvider.get().insert(course);
+	}
+	
+	@POST
+	@Path("{id}")
+	@Transactional
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Course update(
+			@PathParam("id") UUID id,
+			Course course) {
+		return courseProvider.get().update(id, course);
 	}
 
 	private final Provider<CourseManager> courseProvider;
