@@ -25,67 +25,68 @@ public class CourseManager {
 	}
 
 	/**
-	 * Inserts new <code>Course</code> in database if <code>course.getId()!=null</code> 
-	 * (course title, description and author must be other than <code>null</code>), 
-	 * or updates existing <code>Course</code>.
+	 * Inserts new <code>Course</code> in database. Returns <code>Course</code>
+	 * if successful, else <code>null</code>.
 	 */
-	public void insert(Course course) {
+	public Course insert(Course course) {
 
-		if (course.getId() == null) {
-			Log.info("Inserting course \"" + course.getTitle() + "\"...");
-			String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, UUID(?))";
-			try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
-				int index = 0;
-				if (course.getTitle() != null)
-					statement.setString(++index, course.getTitle());
-				else {
-					Log.info("Missing \"title\"");
-					return;
-				}
-				if (course.getDescription() != null)
-					statement.setString(++index, course.getDescription());
-				else {
-					Log.info("Missing \"description\"");
-					return;
-				}
-				if (course.getAuthor() != null)
-					statement.setString(++index, course.getAuthor().getId().toString());
-				else {
-					Log.info("Missing \"author\"");
-					return;
-				}
-				Log.info(statement.executeUpdate() + " rows inserted in database");
-			} catch (SQLException e) {
-				throw new RuntimeException("Unable to insert course", e);
-			}
-		} else {
-			Log.info("Updating course " + course.getId().toString() + "...");
-			StringBuilder queryBuilder = new StringBuilder(1000);
-			queryBuilder.append("UPDATE courses SET ");
+		Log.info("Inserting course \"" + course.getTitle() + "\"...");
+		if (course.getTitle() == null || course.getDescription() == null || course.getAuthor() == null) {
+			Log.info("Aborted - missing parameter(s)");
+			return null;
+		}
+		String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, ?)";
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query,
+				PreparedStatement.RETURN_GENERATED_KEYS)) {
+			int index = 0;
+			statement.setString(++index, course.getTitle());
+			statement.setString(++index, course.getDescription());
+			statement.setObject(++index, course.getAuthor().getId());
+			Log.info(statement.executeUpdate() + " records inserted in database");
+			ResultSet result = statement.getGeneratedKeys();
+			if (result.next())
+				return findById(UUID.class.cast(result.getObject(1)));
+			else
+				return null;
+		} catch (SQLException e) {
+			throw new RuntimeException("Unable to insert course", e);
+		}
+
+	}
+
+	public Course update(UUID id, Course course) {
+
+		Log.info("Updating course " + id.toString() + "...");
+		if(findById(id) == null) {
+			Log.info("Aborted - no such course exists in database");
+			return null;
+		}
+		StringBuilder queryBuilder = new StringBuilder(1000);
+		queryBuilder.append("UPDATE courses SET ");
+		if (course.getTitle() != null)
+			queryBuilder.append("course_title=?");
+		if (course.getTitle() != null && (course.getDescription() != null || course.getAuthor() != null))
+			queryBuilder.append(", ");
+		if (course.getDescription() != null)
+			queryBuilder.append("course_description=?");
+		if (course.getDescription() != null && course.getAuthor() != null)
+			queryBuilder.append(", ");
+		if (course.getAuthor() != null)
+			queryBuilder.append("author_id=? ");
+		queryBuilder.append("WHERE course_id=?");
+		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
+			int index = 0;
 			if (course.getTitle() != null)
-				queryBuilder.append("course_title=?");
-			if (course.getTitle() != null && (course.getDescription() != null || course.getAuthor() != null))
-				queryBuilder.append(", ");
+				statement.setString(++index, course.getTitle());
 			if (course.getDescription() != null)
-				queryBuilder.append("course_description=?");
-			if (course.getDescription() != null && course.getAuthor() != null)
-				queryBuilder.append(", ");
+				statement.setString(++index, course.getDescription());
 			if (course.getAuthor() != null)
-				queryBuilder.append("author_id=UUID(?) ");
-			queryBuilder.append("WHERE course_id=UUID(?)");	
-			try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
-				int index = 0;
-				if (course.getTitle() != null)
-					statement.setString(++index, course.getTitle());
-				if (course.getDescription() != null)
-					statement.setString(++index, course.getDescription());
-				if (course.getAuthor() != null)
-					statement.setString(++index, course.getAuthor().getId().toString());
-				statement.setString(++index, course.getId().toString());
-				Log.info(statement.executeUpdate() + " rows updated in database");
-			} catch (SQLException e) {
-				throw new RuntimeException("Unable to update course", e);
-			}
+				statement.setObject(++index, course.getAuthor().getId());
+			statement.setObject(++index, id);
+			Log.info(statement.executeUpdate() + " records updated in database");
+			return findById(id);
+		} catch (SQLException e) {
+			throw new RuntimeException("Unable to update course", e);
 		}
 	}
 
@@ -137,7 +138,7 @@ public class CourseManager {
 		if (filter.getDescription() != null)
 			queryBuilder.append(" AND lower(course_description) LIKE '%' || lower(?) || '%'");
 		if (filter.getAuthor() != null)
-			queryBuilder.append(" AND author_id=UUID(?)");
+			queryBuilder.append(" AND author_id=?");
 		if (count != null)
 			queryBuilder.append(" LIMIT ?");
 		if (offset != null)
@@ -150,7 +151,7 @@ public class CourseManager {
 			if (filter.getDescription() != null)
 				statement.setString(++index, filter.getDescription());
 			if (filter.getAuthor() != null)
-				statement.setString(++index, filter.getAuthor().getId().toString());
+				statement.setObject(++index, filter.getAuthor().getId());
 			if (count != null)
 				statement.setInt(++index, count);
 			if (offset != null)
