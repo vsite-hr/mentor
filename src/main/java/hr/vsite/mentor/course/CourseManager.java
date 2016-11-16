@@ -26,14 +26,14 @@ public class CourseManager {
 
 	/**
 	 * Inserts new <code>Course</code> in database. Returns <code>Course</code>
-	 * if successful, else <code>null</code>.
+	 * if successful.
 	 */
 	public Course insert(Course course) {
 
 		Log.info("Inserting course \"" + course.getTitle() + "\"...");
 		if (course.getTitle() == null || course.getDescription() == null || course.getAuthor() == null) {
 			Log.info("Aborted - missing parameter(s)");
-			return null;
+			throw new RuntimeException("Missing parameter(s)");
 		}
 		String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, ?)";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query,
@@ -54,34 +54,38 @@ public class CourseManager {
 
 	}
 
-	public Course update(UUID id, Course course) {
+	/**
+	 * Updates existing <code>Course</code> in database. Returns <code>Course</code>
+	 * if successful.
+	 */
+	public Course update(UUID id, Course newValues) {
 
 		Log.info("Updating course " + id.toString() + "...");
 		if(findById(id) == null) {
 			Log.info("Aborted - no such course exists in database");
-			return null;
+			throw new RuntimeException("No such course exists in database");
 		}
 		StringBuilder queryBuilder = new StringBuilder(1000);
 		queryBuilder.append("UPDATE courses SET ");
-		if (course.getTitle() != null)
+		if (newValues.getTitle() != null)
 			queryBuilder.append("course_title=?");
-		if (course.getTitle() != null && (course.getDescription() != null || course.getAuthor() != null))
+		if (newValues.getTitle() != null && (newValues.getDescription() != null || newValues.getAuthor() != null))
 			queryBuilder.append(", ");
-		if (course.getDescription() != null)
+		if (newValues.getDescription() != null)
 			queryBuilder.append("course_description=?");
-		if (course.getDescription() != null && course.getAuthor() != null)
+		if (newValues.getDescription() != null && newValues.getAuthor() != null)
 			queryBuilder.append(", ");
-		if (course.getAuthor() != null)
+		if (newValues.getAuthor() != null)
 			queryBuilder.append("author_id=? ");
 		queryBuilder.append("WHERE course_id=?");
 		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
 			int index = 0;
-			if (course.getTitle() != null)
-				statement.setString(++index, course.getTitle());
-			if (course.getDescription() != null)
-				statement.setString(++index, course.getDescription());
-			if (course.getAuthor() != null)
-				statement.setObject(++index, course.getAuthor().getId());
+			if (newValues.getTitle() != null)
+				statement.setString(++index, newValues.getTitle());
+			if (newValues.getDescription() != null)
+				statement.setString(++index, newValues.getDescription());
+			if (newValues.getAuthor() != null)
+				statement.setObject(++index, newValues.getAuthor().getId());
 			statement.setObject(++index, id);
 			Log.info(statement.executeUpdate() + " records updated in database");
 			return findById(id);
