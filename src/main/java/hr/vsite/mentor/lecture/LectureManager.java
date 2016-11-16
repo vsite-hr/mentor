@@ -13,6 +13,7 @@ import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hr.vsite.mentor.Mentor;
 import hr.vsite.mentor.user.UserManager;
 
 public class LectureManager {
@@ -55,18 +56,14 @@ public class LectureManager {
 		List<Lecture> lectures = new ArrayList<>(count != null ? count : 10);
 		
 		StringBuilder queryBuilder = new StringBuilder(1000);
-		queryBuilder.append("SELECT l.* FROM lectures l WHERE true");		
-		try{
-			if(filter.getCourse() != null)
-				queryBuilder.replace(queryBuilder.indexOf("WHERE true"), 
-									 queryBuilder.length(), 
-									 ", course_lectures cl WHERE l.lecture_id = cl.lecture_id AND cl.course_id = ?");
-		}
-		catch(StringIndexOutOfBoundsException e){
-			throw new RuntimeException("queryBuilder.replace() index is out of bound", e.getCause());
-		}
+		queryBuilder.append("SELECT l.* FROM lectures l WHERE true"); 
+		if(filter.getCourse() != null)
+			queryBuilder.append(" AND EXISTS (SELECT 1 FROM course_lectures cl WHERE l.lecture_id = cl.lecture_id AND cl.course_id = ?)");
 		if (filter.getTitle() != null)
-			queryBuilder.append(" AND lower(l.lecture_title) LIKE lower('%'||?||'%')");
+			queryBuilder.append(" AND lower(l.lecture_title COLLATE \""+
+										Mentor.DefaultLocale.toString()+
+										"\") LIKE lower('%'||?||'%' COLLATE \""+
+										Mentor.DefaultLocale.toString()+"\")"); 
 		if (filter.getAuthor() != null)
 			queryBuilder.append(" AND l.author_id = ?");
 		if (count != null)
