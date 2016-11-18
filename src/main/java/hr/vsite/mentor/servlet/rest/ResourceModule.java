@@ -5,6 +5,8 @@ import javax.ws.rs.ext.ParamConverter;
 import com.google.inject.AbstractModule;
 
 import hr.vsite.mentor.course.Course;
+import hr.vsite.mentor.error.JsonResponseError;
+import hr.vsite.mentor.error.MentorError;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.servlet.rest.param.CourseParamConverter;
 import hr.vsite.mentor.servlet.rest.param.JaxRsParams;
@@ -12,6 +14,10 @@ import hr.vsite.mentor.servlet.rest.param.LectureParamConverter;
 import hr.vsite.mentor.servlet.rest.param.UnitParamConverter;
 import hr.vsite.mentor.servlet.rest.param.UserParamConverter;
 import hr.vsite.mentor.servlet.rest.providers.GuiceParamConverterProvider;
+import hr.vsite.mentor.servlet.rest.providers.IllegalArgumentExceptionMapperProvider;
+import hr.vsite.mentor.servlet.rest.providers.NoSuchElementExceptionMapperProvider;
+import hr.vsite.mentor.servlet.rest.providers.ReaderExceptionMapperProvider;
+import hr.vsite.mentor.servlet.rest.providers.RuntimeExceptionMapperProvider;
 import hr.vsite.mentor.servlet.rest.providers.ObjectMapperProvider;
 import hr.vsite.mentor.servlet.rest.resources.RootResource;
 import hr.vsite.mentor.servlet.rest.resources.UnitResource;
@@ -32,6 +38,10 @@ public class ResourceModule extends AbstractModule {
 		// providers
 		bind(ObjectMapperProvider.class);
 		bind(GuiceParamConverterProvider.class);
+		bind(ReaderExceptionMapperProvider.class);
+		bind(IllegalArgumentExceptionMapperProvider.class);
+		bind(NoSuchElementExceptionMapperProvider.class);
+		bind(RuntimeExceptionMapperProvider.class);
 		
 		// params
 		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(User.class)).to(UserParamConverter.class);
@@ -46,6 +56,9 @@ public class ResourceModule extends AbstractModule {
 		bind(CourseResource.class);
 		bind(LectureResource.class);
 		bind(UnitResource.class);
+		
+		// error
+		bind(MentorError.class).to(JsonResponseError.class);
 		
 	}
 
