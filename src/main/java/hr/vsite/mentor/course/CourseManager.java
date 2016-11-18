@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -33,7 +34,7 @@ public class CourseManager {
 		Log.info("Inserting course \"" + course.getTitle() + "\"...");
 		if (course.getTitle() == null || course.getDescription() == null || course.getAuthor() == null) {
 			Log.info("Aborted - missing parameter(s)");
-			throw new RuntimeException("Missing parameter(s)");
+			throw new IllegalArgumentException("Missing parameter(s). Title, description and author are mandatory.");
 		}
 		String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, ?)";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query,
@@ -44,11 +45,14 @@ public class CourseManager {
 			statement.setObject(++index, course.getAuthor().getId());
 			Log.info(statement.executeUpdate() + " records inserted in database");
 			ResultSet result = statement.getGeneratedKeys();
-			if (result.next())
-				return findById(UUID.class.cast(result.getObject(1)));
+			if (result.next()) {
+				course.setId(UUID.class.cast(result.getObject(1)));
+				return course;
+			}
 			else
-				return null;
+				throw new NoSuchElementException("Database error. Did not return auto-generated course ID.");
 		} catch (SQLException e) {
+			Log.info("Unable to insert course", e);
 			throw new RuntimeException("Unable to insert course", e);
 		}
 
@@ -58,39 +62,53 @@ public class CourseManager {
 	 * Updates existing <code>Course</code> in database. Returns <code>Course</code>
 	 * if successful.
 	 */
-	public Course update(UUID id, Course newValues) {
+	public Course update(Course newValues) {
 
-		Log.info("Updating course " + id.toString() + "...");
-		if(findById(id) == null) {
-			Log.info("Aborted - no such course exists in database");
-			throw new RuntimeException("No such course exists in database");
+		Log.info("Updating course " + newValues.getId().toString() + "...");
+		if (newValues.getTitle() == null || newValues.getDescription() == null || newValues.getAuthor() == null) {
+			Log.info("Aborted - missing parameter(s)");
+			throw new IllegalArgumentException("Missing parameter(s). Title, description and author are mandatory.");
 		}
-		StringBuilder queryBuilder = new StringBuilder(1000);
-		queryBuilder.append("UPDATE courses SET ");
-		if (newValues.getTitle() != null)
-			queryBuilder.append("course_title=?");
-		if (newValues.getTitle() != null && (newValues.getDescription() != null || newValues.getAuthor() != null))
-			queryBuilder.append(", ");
-		if (newValues.getDescription() != null)
-			queryBuilder.append("course_description=?");
-		if (newValues.getDescription() != null && newValues.getAuthor() != null)
-			queryBuilder.append(", ");
-		if (newValues.getAuthor() != null)
-			queryBuilder.append("author_id=? ");
-		queryBuilder.append("WHERE course_id=?");
-		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
+		if(findById(newValues.getId()) == null) {
+			Log.info("Aborted - no such course exists in database");
+			throw new NoSuchElementException("No such course exists in database.");
+		}
+		String query = "UPDATE courses SET course_title=?, course_description=?, author_id=? WHERE course_id=?";
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
 			int index = 0;
-			if (newValues.getTitle() != null)
-				statement.setString(++index, newValues.getTitle());
-			if (newValues.getDescription() != null)
-				statement.setString(++index, newValues.getDescription());
-			if (newValues.getAuthor() != null)
-				statement.setObject(++index, newValues.getAuthor().getId());
-			statement.setObject(++index, id);
-			Log.info(statement.executeUpdate() + " records updated in database");
-			return findById(id);
+			statement.setString(++index, newValues.getTitle());
+			statement.setString(++index, newValues.getDescription());
+			statement.setObject(++index, newValues.getAuthor().getId());
+			statement.setObject(++index, newValues.getId());
+			if(statement.executeUpdate() == 1)
+				Log.info("Record successfully updated");
+			return newValues;
 		} catch (SQLException e) {
+			Log.info("Unable to update course", e);
 			throw new RuntimeException("Unable to update course", e);
+		}
+	}
+	
+	/**
+	 * Deletes a <code>Course</code> from database.
+	 */
+	public void delete(UUID id) {
+		
+		Log.info("Deleting course " + id.toString() + "...");
+		String query = "DELETE FROM courses WHERE course_id=?";
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
+			int index = 0;
+			statement.setObject(++index, id);
+			if(statement.executeUpdate() == 1) {
+				Log.info("Record successfully deleted");
+			}
+			else {
+				Log.info("Record does not exist");
+				throw new NoSuchElementException("Record does not exist");
+			}
+		} catch (SQLException e) {
+			Log.info("Unable to delete course", e);
+			throw new RuntimeException("Unable to delete course", e);
 		}
 	}
 
