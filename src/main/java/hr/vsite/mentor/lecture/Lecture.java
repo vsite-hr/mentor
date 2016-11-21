@@ -39,6 +39,14 @@ public class Lecture {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString(){
+		return ("[id: " + (id != null ? id.toString() : "") + ", " +
+				"title:" + (title != null ? title : "") + ", " +
+				"Description" + (description != null ? description : "") + ", " +
+				"Author ID: " + (author.getId() != null ? author.getId().toString() : " ") + "]");
+	}
 
 	private UUID id;
 	private String title;
