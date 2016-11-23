@@ -2,6 +2,11 @@ package hr.vsite.mentor.course;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import hr.vsite.mentor.servlet.rest.providers.ObjectMapperProvider;
 import hr.vsite.mentor.user.User;
 
 public class Course {
@@ -40,9 +45,27 @@ public class Course {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		
+		try {
+			return mapper.writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+	
 	private UUID id;
 	private String title;
 	private String description;
 	private User author;
+	
+	@JsonIgnore
+	private static final ObjectMapper mapper;
 
+	static {
+		ObjectMapperProvider mapperProvider = new ObjectMapperProvider();
+		mapper = mapperProvider.getContext(Course.class);
+		}
 }
