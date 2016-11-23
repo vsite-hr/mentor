@@ -1,16 +1,23 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
 import java.util.List;
+import java.util.UUID;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.transaction.Transactional;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
@@ -18,7 +25,7 @@ import hr.vsite.mentor.lecture.LectureFilter;
 import hr.vsite.mentor.lecture.LectureManager;
 import hr.vsite.mentor.user.User;
 
-@Path("lecture")
+@Path("lectures")
 public class LectureResource {
 	
 	@Inject
@@ -27,7 +34,6 @@ public class LectureResource {
 	}
 	
 	@GET
-	@Path("list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public List<Lecture> list(
@@ -46,17 +52,47 @@ public class LectureResource {
 	}
    
 	@GET
-	@Path("{lecture_id}")
+	@Path("{lectureId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Lecture findById(@PathParam("lecture_id") Lecture lecture_id) {
+	public Lecture findById(@PathParam("lectureId") Lecture lectureId) {
 
-		if (lecture_id == null)
+		if (lectureId == null)
 			throw new NotFoundException();
 
-		return lecture_id;
+		return lectureId;
 
 	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response insert(Lecture lecture){
+		
+		return Response.status(201).entity(lectureProvider.get().insert(lecture)).build();
+	}
+	
+	@PUT
+	@Path("{lectureId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response update(@PathParam("lectureId")UUID lectureId, Lecture lecture){
+		
+		lectureProvider.get().update(lectureId, lecture);
+		return Response.status(200).entity(lectureProvider.get().findById(lectureId)).build();
+	}
+
+	@DELETE
+	@Path("{lectureId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response delete(@PathParam("lectureId")UUID lectureId){
+		
+		return Response.status(200).entity(lectureProvider.get().delete(lectureId)).build();
+	}
+
 
 	private final Provider<LectureManager> lectureProvider;
 }

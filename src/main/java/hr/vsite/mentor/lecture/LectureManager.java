@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -34,7 +35,7 @@ public class LectureManager {
 	        }
 		} 
 		catch (SQLException e) {
-			throw new RuntimeException("Unable to find lecture with id " + id, e.getCause());
+			throw new RuntimeException("Unable to find lecture with id " + id, e);
 		}	
 	}
 	
@@ -90,7 +91,7 @@ public class LectureManager {
 	        }
 		} 
 		catch (SQLException e) {
-			throw new RuntimeException("Unable to list lectures", e.getCause());
+			throw new RuntimeException("Unable to list lectures", e);
 		}
 		
 	    return lectures;	
@@ -108,12 +109,130 @@ public class LectureManager {
 				return null;
 			lecture.setTitle(resultSet.getString("lecture_title"));
 			lecture.setDescription(resultSet.getString("lecture_description"));
+			lecture.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
 		} 
 		catch (SQLException e) {
-			throw new RuntimeException("Unable to resolve lectures from result set", e.getCause());
+			throw new RuntimeException("Unable to resolve lectures from result set", e);
 		}
 		
 		return lecture;
+	}
+	
+	public Lecture insert(Lecture lecture){
+		
+		if(lecture.getTitle() == null || lecture.getDescription() == null || lecture.getAuthor().getId() == null) {
+			Log.info("Aborted - missing parameter(s) in Lecture");
+			throw new IllegalArgumentException("Missing parameter(s). Title, description and authorID are mandatory.");
+		}
+		
+		String query = "INSERT INTO lectures VALUES (DEFAULT, ?, ?, ?)";		
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)){
+			int index = 0;
+			statement.setString(++index, lecture.getTitle());
+			statement.setString(++index, lecture.getDescription());
+			statement.setObject(++index, lecture.getAuthor().getId());			
+			statement.executeUpdate();
+			ResultSet resultSet = statement.getGeneratedKeys();
+			
+			if(resultSet.next()){
+				lecture.setId(UUID.class.cast(resultSet.getObject("lecture_id")));
+				Log.info("New Lecture inserted: {}", lecture.toString());
+			}
+			else{
+				Log.info("getGeneratedKeys(), Did not return auto-generated key for last inserted Lecture: {}", lecture.toString());
+				throw new NoSuchElementException("getGeneratedKeys(), Did not return auto-generated key for last inserted Lecture.");
+			}
+		} 
+		catch (SQLException e) {
+			Log.info("Unable to insert Lecture: ", e);
+			throw new RuntimeException("Unable to insert Lecture", e);
+		}
+		
+		return lecture;
+	}
+	
+	public Lecture update(UUID lectureId, Lecture lecture){
+		
+		if(lecture == null){
+			Log.info("Lecture parameters are not provided.");
+			throw new IllegalArgumentException("Lecture parameters are not provided.");
+		}		
+		if(lectureId == null){
+			Log.info("LectureId for Lecture to update is not provided.");
+			throw new IllegalArgumentException("LectureId for Lecture to update is not provided.");
+		}			
+		if(findById(lectureId) == null){
+			Log.info("Lecture with ID {} does not exist in Database", lectureId.toString());
+			throw new NoSuchElementException("Lecture with ID  "+ lectureId.toString() +" does not exist in Database");
+		}
+		
+		StringBuilder queryBuilder = new StringBuilder(1000);
+		queryBuilder.append("UPDATE lectures SET");
+		if(lecture.getTitle() != null)
+			queryBuilder.append(" lecture_title = ?,");
+		if(lecture.getDescription() != null)
+			queryBuilder.append(" lecture_description = ?,");
+		if(lecture.getAuthor().getId() != null)
+			queryBuilder.append(" author_id = ?,");
+		queryBuilder.deleteCharAt(queryBuilder.lastIndexOf(","));
+		queryBuilder.append(" WHERE lecture_id = ?");
+		
+		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
+			int index = 0;
+			if (lecture.getTitle() != null)
+			    statement.setString(++index, lecture.getTitle());
+			if (lecture.getDescription() != null)
+			    statement.setString(++index, lecture.getDescription());
+			if (lecture.getAuthor().getId() != null)
+			    statement.setObject(++index, lecture.getAuthor().getId());
+			statement.setObject(++index, lectureId);
+			
+			if(statement.executeUpdate() == 1){
+				Log.info("Lecture {} updated", lectureId.toString());
+			}
+			else{
+				Log.info("Unable to update Lecture: ID - {}", lectureId.toString());
+				throw new RuntimeException("Unable to update Lecture: ID - " + lectureId.toString());
+			}		
+		} 
+		catch (SQLException e) {
+			Log.info("Unable to update Lecture ID - {}", lectureId.toString());
+			throw new RuntimeException("Unable to update lecture ID - " + lectureId.toString());
+		}
+
+		return lecture;
+	}
+	
+	public Lecture delete(UUID lectureId){
+		
+		if(lectureId == null){
+			Log.info("LectureId for lecture to delete is not provided.");
+			throw new IllegalArgumentException("LectureId for Lecture to delete is not provided.");
+		}
+		
+		Lecture dBLecture = findById(lectureId);
+		if(dBLecture == null){
+			Log.info("Lecture with ID {} does not exist in Database", lectureId.toString());
+			throw new NoSuchElementException("Lecture with ID  "+ lectureId.toString() +" does not exist in Database");
+		}
+			
+		String query = "DELETE FROM lectures WHERE lecture_id = ?";
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, lectureId);
+			if(statement.executeUpdate() == 1){
+				Log.info("Lecture {} deleted", lectureId.toString());
+			}
+			else{
+				Log.info("Unable to delete Lecture: ID - {}", lectureId.toString());
+				throw new RuntimeException("Unable to delete Lecture: ID - " + lectureId.toString());
+			}
+		} 
+		catch (SQLException e) {
+			Log.info("Unable to delete Lecture: ", e);
+			throw new RuntimeException("Unable to delete Lecture", e);
+		}
+
+		return dBLecture;
 	}
 	
 	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
