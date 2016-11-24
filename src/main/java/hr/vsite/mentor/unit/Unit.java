@@ -3,6 +3,8 @@ package hr.vsite.mentor.unit;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import hr.vsite.mentor.user.User;
 
 public abstract class Unit {
@@ -16,16 +18,22 @@ public abstract class Unit {
 		Series
 	}
 	
+	@JsonProperty
 	public UUID getId() { return id; }
 	public void setId(UUID id) { this.id = id; }
+	@JsonProperty
 	public Type getUnitType() { return unitType; }
 	public void setUnitType(Type unitType) { this.unitType = unitType; }
+	@JsonProperty
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
+	@JsonProperty
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
+	@JsonProperty
 	public List<String> getKeywords() { return keywords; }
 	public void setKeywords(List<String> keywords) { this.keywords = keywords; }
+	@JsonProperty
 	public Object getAttributes() { return attributes; }
 	public void setAttributes(Object attributes) { this.attributes = attributes; }
 

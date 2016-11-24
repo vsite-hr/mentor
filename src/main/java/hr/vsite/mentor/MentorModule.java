@@ -45,7 +45,12 @@ public class MentorModule extends AbstractModule {
 			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 			.configure(MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME, true)
 			.setSerializationInclusion(Include.NON_NULL)
-			.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+			.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
+			.disable(MapperFeature.AUTO_DETECT_CREATORS)
+			.disable(MapperFeature.AUTO_DETECT_FIELDS)
+			.disable(MapperFeature.AUTO_DETECT_GETTERS)
+			.disable(MapperFeature.AUTO_DETECT_IS_GETTERS)
+			;
 	}
 
 }

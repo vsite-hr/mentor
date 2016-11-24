@@ -2,16 +2,22 @@ package hr.vsite.mentor.lecture;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import hr.vsite.mentor.user.User;
 
 public class Lecture {
 
+	@JsonProperty
 	public UUID getId() { return id; }
 	public void setId(UUID id) { this.id = id; }
+	@JsonProperty
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
+	@JsonProperty
 	public String getDescription() { return description; }
 	public void setDescription(String description) { this.description = description; }
+	@JsonProperty
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
 	
