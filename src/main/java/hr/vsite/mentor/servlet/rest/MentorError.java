@@ -1,4 +1,4 @@
-package hr.vsite.mentor.error;
+package hr.vsite.mentor.servlet.rest;
 
 public class MentorError {
 

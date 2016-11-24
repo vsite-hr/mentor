@@ -6,15 +6,29 @@ import hr.vsite.mentor.user.User;
 
 public abstract class Unit {
 
+	public static enum Type {
+		Text,
+		Video,
+		Audio,
+		Image,
+		Quiz,
+		Series
+	}
+	
 	public UUID getId() { return id; }
 	public void setId(UUID id) { this.id = id; }
-	public UnitType getType() { return type; }
-	public void setType(UnitType type) { this.type = type; }
+	public Type getUnitType() { return unitType; }
+	public void setUnitType(Type unitType) { this.unitType = unitType; }
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
+	public Object getAttributes() { return attributes; }
+	public void setAttributes(Object attributes) { this.attributes = attributes; }
 
+	/** Override if derived unit can provide thumbnail */
+	public String getThumbnailUrl() { return null; }
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -41,8 +55,9 @@ public abstract class Unit {
 	}
 	
 	private UUID id;
-	private UnitType type;
+	private Type unitType;
 	private String title;
 	private User author;
-
+	private Object attributes;
+	
 }

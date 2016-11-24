@@ -1,5 +1,6 @@
 package hr.vsite.mentor.unit;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,55 +16,29 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import hr.vsite.mentor.user.UserManager;
 
 public class UnitManager {
 
 	@Inject
-	public UnitManager(Provider<UserManager> userProvider, Provider<Connection> connProvider) {
+	public UnitManager(Provider<UserManager> userProvider, Provider<Connection> connProvider, ObjectMapper mapper) {
 		this.userProvider = userProvider;
 		this.connProvider = connProvider;
+		this.mapper = mapper;
 	}
 
 	/** Returns <code>Unit</code> with corresponding id, or <code>null</code> if such unit does not exist. */
 	public Unit findById(UUID id) {
 		
-	    try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT unit_type FROM units WHERE unit_id = ?")) {
+	    try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT * FROM units WHERE unit_id = ?")) {
 		    statement.setObject(1, id);
 	        try (ResultSet resultSet = statement.executeQuery()) {
-	        	return resultSet.next() ? findById(id, UnitType.valueOf(resultSet.getString("unit_type"))) : null;
+	        	return resultSet.next() ? fromResultSet(resultSet) : null;
 	        }
 		} catch (SQLException e) {
 			throw new RuntimeException("Unable to find unit with id " + id, e);
-		}
-	    
-	}
-	
-	/** Returns <code>Unit</code> with corresponding id that is of known type, or <code>null</code> if such unit does not exist. */
-	public Unit findById(UUID id, UnitType type) {
-		
-		switch (type) {
-			case Text: return findTextById(id);
-			case Video: throw new NotImplementedException("Video unit not implemented");
-			case Audio: throw new NotImplementedException("Audio unit not implemented");
-			case Image: throw new NotImplementedException("Image unit not implemented");
-			case Quiz: throw new NotImplementedException("Quiz unit not implemented");
-		}
-
-		throw new IllegalArgumentException("Unknown unit type: " + type);
-
-	}
-	
-	/** Returns text <code>Unit</code> with corresponding id, or <code>null</code> if such text unit does not exist. */
-	public TextUnit findTextById(UUID id) {
-		
-	    try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT * FROM units_text WHERE unit_id = ?")) {
-		    statement.setObject(1, id);
-	        try (ResultSet resultSet = statement.executeQuery()) {
-	        	return resultSet.next() ? textFromResultSet(resultSet) : null;
-	        }
-		} catch (SQLException e) {
-			throw new RuntimeException("Unable to find text unit with id " + id, e);
 		}
 	    
 	}
@@ -116,57 +91,73 @@ public class UnitManager {
 				statement.setInt(++index, offset);
 	        try (ResultSet resultSet = statement.executeQuery()) {
 	        	while(resultSet.next())
-	        		units.add(findById(UUID.class.cast(resultSet.getObject("unit_id")), UnitType.valueOf(resultSet.getString("unit_type"))));
+	        		units.add(fromResultSet(resultSet));
 	        }
 		} catch (SQLException e) {
-			throw new RuntimeException("Unable to list users", e);
+			throw new RuntimeException("Unable to list units", e);
 		}
 		
 	    return units;
 
 	}
 
-	/** Parses given ResultSet and extract text Unit instance from it.
-	 * If ResultSet had <code>NULL</code> in <code>unit_id</code> column, <code>null</code> is returned. */
-	public TextUnit textFromResultSet(ResultSet resultSet) {
+	/** Parses given ResultSet and extract Unit instance from it. */
+	public Unit fromResultSet(ResultSet resultSet) {
 
-		TextUnit unit = new TextUnit();
-		
-		if (!baseFromResultSet(unit, resultSet))
-			return null;
-		
 		try {
-			unit.setMarkupType(MarkupType.valueOf(resultSet.getString("unit_markup_type")));
-			unit.setMarkup(resultSet.getString("unit_markup"));
-		} catch (SQLException e) {
-			throw new RuntimeException("Unable to resolve text unit from result set", e);
-		}
-		
-		return unit;
-		
-	}
+			
+			Unit unit = null;
+			
+			Unit.Type type = Unit.Type.valueOf(resultSet.getString("unit_type"));
+			String attributesAsString = resultSet.getString("unit_attributes");
+			switch (type) {
+				case Text: {
+					TextUnitAttributes attributes = mapper.readValue(attributesAsString, TextUnitAttributes.class);
+					switch (attributes.getTextUnitType()) {
+						case Mentor:
+							unit = new MentorTextUnit();
+							unit.setAttributes(mapper.readValue(attributesAsString, MentorTextUnitAttributes.class));
+							break;
+						case GoogleDoc:
+							throw new NotImplementedException("GoogleDoc text unit not implemented");
+						case Open365:
+							throw new NotImplementedException("Open365 text unit not implemented");
+					}
+					break;
+				}
+				case Video:
+					throw new NotImplementedException("Video unit not implemented");
+				case Audio:
+					throw new NotImplementedException("Audio unit not implemented");
+				case Image:
+					throw new NotImplementedException("Image unit not implemented");
+				case Quiz:
+					throw new NotImplementedException("Quiz unit not implemented");
+				case Series:
+					throw new NotImplementedException("Series unit not implemented");
+			}
 	
-	/** Parses given ResultSet and extract Unit base properties from it. */
-	private boolean baseFromResultSet(Unit unit, ResultSet resultSet) {
-
-		try {
+			if (unit == null)
+				throw new IllegalArgumentException("Unknown unit type: " + type);
+	
 			unit.setId(UUID.class.cast(resultSet.getObject("unit_id")));
-			if (resultSet.wasNull())
-				return false;
-			unit.setType(UnitType.valueOf(resultSet.getString("unit_type")));
+			unit.setUnitType(Unit.Type.valueOf(resultSet.getString("unit_type")));
 			unit.setTitle(resultSet.getString("unit_title"));
 			unit.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
-		} catch (SQLException e) {
-			throw new RuntimeException("Unable to resolve base unit from result set", e);
+			
+			return unit;
+
+		} catch (SQLException | IOException e) {
+			throw new RuntimeException("Unable to resolve text unit from result set", e);
 		}
-		
-		return true;
-		
+
 	}
 	
+	@SuppressWarnings("unused")
 	private static final Logger Log = LoggerFactory.getLogger(UnitManager.class);
 
 	private final Provider<UserManager> userProvider;
 	private final Provider<Connection> connProvider;
+	private final ObjectMapper mapper;
 	
 }

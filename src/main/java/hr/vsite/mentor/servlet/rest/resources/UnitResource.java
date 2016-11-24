@@ -17,10 +17,9 @@ import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.UnitFilter;
 import hr.vsite.mentor.unit.UnitManager;
-import hr.vsite.mentor.unit.UnitType;
 import hr.vsite.mentor.user.User;
 
-@Path("unit")
+@Path("units")
 public class UnitResource {
 
 	@Inject
@@ -33,7 +32,7 @@ public class UnitResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public List<Unit> list(
-		@QueryParam("type") UnitType type,
+		@QueryParam("type") Unit.Type type,
 		@QueryParam("title") String title,
 		@QueryParam("author") User author,
 		@QueryParam("lecture") Lecture lecture,

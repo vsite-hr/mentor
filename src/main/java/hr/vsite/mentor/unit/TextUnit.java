@@ -1,35 +1,16 @@
 package hr.vsite.mentor.unit;
 
-import org.apache.commons.lang3.NotImplementedException;
+public abstract class TextUnit extends Unit {
 
-public class TextUnit extends Unit {
-
-	public MarkupType getMarkupType() { return markupType; }
-	public void setMarkupType(MarkupType markupType) { this.markupType = markupType; }
-	public String getMarkup() { return markup; }
-	public void setMarkup(String markup) { this.markup = markup; }
-	
-	public String getHtml() {
-		if (html == null)
-			html = generateHtml();
-		return html;
-	}
-	
-	private String generateHtml() {
-		switch (markupType) {
-			case None: return markup;
-			case Markdown: return generateHtmlFromMarkdown();
-		}
-		throw new IllegalArgumentException("Unknown markup type: " + markupType);
+	public static enum Type {
+		Mentor,
+		GoogleDoc,
+		Open365
 	}
 
-	private String generateHtmlFromMarkdown() {
-		// TODO implement TextUnit.generateHtmlFromMarkdown 
-		throw new NotImplementedException("TextUnit.generateHtmlFromMarkdown");
-	}
-	
-	private MarkupType markupType;
-	private String markup;
-	private String html;	// lazy eval
+	@Override
+	public TextUnitAttributes getAttributes() { return TextUnitAttributes.class.cast(super.getAttributes()); }
+	@Override
+	public void setAttributes(Object attributes) { super.setAttributes(TextUnitAttributes.class.cast(attributes)); }
 	
 }

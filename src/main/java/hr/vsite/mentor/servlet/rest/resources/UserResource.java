@@ -17,7 +17,7 @@ import hr.vsite.mentor.user.User;
 import hr.vsite.mentor.user.UserFilter;
 import hr.vsite.mentor.user.UserManager;
 
-@Path("user")
+@Path("users")
 public class UserResource {
 
 	@Inject
