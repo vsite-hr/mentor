@@ -1,5 +1,6 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
+import java.nio.file.Files;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -12,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.unit.Unit;
@@ -65,6 +67,25 @@ public class UnitResource {
 
 	}
 
+	@GET
+	@Path("{unit}/thumbnail")
+	public Response photo(
+		@PathParam("unit") Unit unit
+	) {
+
+		if (unit == null)
+			throw new NotFoundException();
+
+		java.nio.file.Path path = unit.getThumbnailPath();
+		if (path != null && Files.exists(path))
+			return Response.ok(path.toFile()).build();
+		
+		// TODO if unit is of external type and we can redirect to another url that holds thumbnail, make it so
+		
+		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
+
+	}
+	
 	private final Provider<UnitManager> unitProvider;
     
 }

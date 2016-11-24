@@ -1,10 +1,12 @@
 package hr.vsite.mentor.unit;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import hr.vsite.mentor.MentorConfiguration;
 import hr.vsite.mentor.user.User;
 
 public abstract class Unit {
@@ -18,6 +20,10 @@ public abstract class Unit {
 		Series
 	}
 	
+	public static Path getDataFolder() {
+		return MentorConfiguration.get().getSubDataPath("units");
+	}
+
 	@JsonProperty
 	public UUID getId() { return id; }
 	public void setId(UUID id) { this.id = id; }
@@ -38,8 +44,8 @@ public abstract class Unit {
 	public void setAttributes(Object attributes) { this.attributes = attributes; }
 
 	/** Override if derived unit can provide thumbnail */
-	public String getThumbnailUrl() { return null; }
-	
+	public Path getThumbnailPath() { return null; }
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

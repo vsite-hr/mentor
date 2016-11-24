@@ -1,5 +1,3 @@
-ALTER TYPE public.unit_type ADD VALUE 'Series' AFTER 'Quiz';
-
 GRANT ALL ON TABLE public.course_lectures TO mentor;
 ALTER TABLE public.units ADD COLUMN unit_attributes jsonb;
 INSERT INTO public.units(unit_id, unit_type, unit_title, author_id, unit_attributes) SELECT unit_id, unit_type, unit_title, author_id, json_build_object('markupType', unit_markup_type::text, 'markup', unit_markup) FROM units_text;
