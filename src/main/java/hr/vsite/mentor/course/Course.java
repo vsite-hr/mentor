@@ -47,25 +47,12 @@ public class Course {
 	
 	@Override
 	public String toString() {
-		
-		try {
-			return mapper.writeValueAsString(this);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-
+		return id + "/" + title;
 	}
 	
 	private UUID id;
 	private String title;
 	private String description;
 	private User author;
-	
-	@JsonIgnore
-	private static final ObjectMapper mapper;
 
-	static {
-		ObjectMapperProvider mapperProvider = new ObjectMapperProvider();
-		mapper = mapperProvider.getContext(Course.class);
-		}
 }
