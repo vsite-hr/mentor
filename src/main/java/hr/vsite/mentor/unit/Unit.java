@@ -21,7 +21,7 @@ public abstract class Unit {
 	}
 	
 	public static Path getDataFolder() {
-		return MentorConfiguration.get().getSubDataPath("units");
+		return MentorConfiguration.get().getSubDataPath("unit");
 	}
 
 	@JsonProperty

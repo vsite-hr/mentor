@@ -1,4 +1,4 @@
-package hr.vsite.mentor.unit;
+package hr.vsite.mentor.unit.text;
 
 public enum MarkupType {
 

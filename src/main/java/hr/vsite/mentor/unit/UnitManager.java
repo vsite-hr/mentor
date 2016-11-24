@@ -20,6 +20,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hr.vsite.mentor.db.JdbcUtils;
+import hr.vsite.mentor.unit.text.MentorTextUnit;
+import hr.vsite.mentor.unit.text.MentorTextUnitAttributes;
+import hr.vsite.mentor.unit.text.TextUnitAttributes;
+import hr.vsite.mentor.unit.video.MentorVideoUnit;
+import hr.vsite.mentor.unit.video.MentorVideoUnitAttributes;
+import hr.vsite.mentor.unit.video.VideoUnitAttributes;
 import hr.vsite.mentor.user.UserManager;
 
 public class UnitManager {
@@ -128,7 +134,18 @@ public class UnitManager {
 					break;
 				}
 				case Video:
-					throw new NotImplementedException("Video unit not implemented");
+					VideoUnitAttributes attributes = mapper.readValue(attributesAsString, VideoUnitAttributes.class);
+					switch (attributes.getVideoUnitType()) {
+						case Mentor:
+							unit = new MentorVideoUnit();
+							unit.setAttributes(mapper.readValue(attributesAsString, MentorVideoUnitAttributes.class));
+							break;
+						case YouTube:
+							throw new NotImplementedException("YouTube video unit not implemented");
+						case Vimeo:
+							throw new NotImplementedException("Vimeo video unit not implemented");
+					}
+					break;
 				case Audio:
 					throw new NotImplementedException("Audio unit not implemented");
 				case Image:

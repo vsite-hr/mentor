@@ -1,4 +1,4 @@
-package hr.vsite.mentor.unit;
+package hr.vsite.mentor.unit.text;
 
 import org.apache.commons.lang3.NotImplementedException;
 

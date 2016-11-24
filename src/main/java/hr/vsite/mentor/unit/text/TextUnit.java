@@ -1,4 +1,6 @@
-package hr.vsite.mentor.unit;
+package hr.vsite.mentor.unit.text;
+
+import hr.vsite.mentor.unit.Unit;
 
 public abstract class TextUnit extends Unit {
 

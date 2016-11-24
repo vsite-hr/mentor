@@ -1,0 +1,2 @@
+INSERT INTO units (unit_id, unit_type, unit_title, author_id, unit_attributes, unit_keywords) VALUES ('8faae33a-b27b-11e6-aedd-4485006d0fd8', 'Video', 'Introduction to Electricity', '5da6bf98-a467-11e6-aedd-4485006d0fd8', '{"width": 320, "height": 240, "duration": 315, "videoUnitType": "Mentor"}', NULL);
+INSERT INTO lecture_units (lecture_id, unit_id, unit_ordinal) VALUES ('200ceefa-a476-11e6-aedd-4485006d0fd8', '8faae33a-b27b-11e6-aedd-4485006d0fd8', 3);

@@ -10,7 +10,7 @@ import hr.vsite.mentor.MentorConfiguration;
 public class User {
 
 	public static Path getDataFolder() {
-		return MentorConfiguration.get().getSubDataPath("users");
+		return MentorConfiguration.get().getSubDataPath("user");
 	}
 
 	@JsonProperty
