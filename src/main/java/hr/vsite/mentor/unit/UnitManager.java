@@ -1,12 +1,12 @@
 package hr.vsite.mentor.unit;
 
 import java.io.IOException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import hr.vsite.mentor.db.JdbcUtils;
 import hr.vsite.mentor.user.UserManager;
 
 public class UnitManager {
@@ -146,9 +147,7 @@ public class UnitManager {
 			unit.setId(UUID.class.cast(resultSet.getObject("unit_id")));
 			unit.setTitle(resultSet.getString("unit_title"));
 			unit.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
-			String[] keywordsAsArray = (String[]) resultSet.getArray("unit_keywords").getArray();
-			if (keywordsAsArray != null)
-				unit.setKeywords(Arrays.asList(keywordsAsArray));
+			unit.setKeywords(JdbcUtils.array2List(resultSet.getArray("unit_keywords"), String[].class));
 			
 			return unit;
 
