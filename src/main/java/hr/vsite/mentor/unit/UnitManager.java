@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -140,10 +141,14 @@ public class UnitManager {
 			if (unit == null)
 				throw new IllegalArgumentException("Unknown unit type: " + type);
 	
+			unit.setUnitType(type);
+
 			unit.setId(UUID.class.cast(resultSet.getObject("unit_id")));
-			unit.setUnitType(Unit.Type.valueOf(resultSet.getString("unit_type")));
 			unit.setTitle(resultSet.getString("unit_title"));
 			unit.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
+			String[] keywordsAsArray = (String[]) resultSet.getArray("unit_keywords").getArray();
+			if (keywordsAsArray != null)
+				unit.setKeywords(Arrays.asList(keywordsAsArray));
 			
 			return unit;
 

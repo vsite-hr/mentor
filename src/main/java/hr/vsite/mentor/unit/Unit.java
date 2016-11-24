@@ -1,5 +1,6 @@
 package hr.vsite.mentor.unit;
 
+import java.util.List;
 import java.util.UUID;
 
 import hr.vsite.mentor.user.User;
@@ -23,6 +24,8 @@ public abstract class Unit {
 	public void setTitle(String title) { this.title = title; }
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
+	public List<String> getKeywords() { return keywords; }
+	public void setKeywords(List<String> keywords) { this.keywords = keywords; }
 	public Object getAttributes() { return attributes; }
 	public void setAttributes(Object attributes) { this.attributes = attributes; }
 
@@ -58,6 +61,7 @@ public abstract class Unit {
 	private Type unitType;
 	private String title;
 	private User author;
+	private List<String> keywords;
 	private Object attributes;
 	
 }
