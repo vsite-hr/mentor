@@ -50,8 +50,7 @@ public class Lecture {
 	public String toString(){
 		return ("[id: " + (id != null ? id.toString() : "") + ", " +
 				"title:" + (title != null ? title : "") + ", " +
-				"Description" + (description != null ? description : "") + ", " +
-				"Author ID: " + (author.getId() != null ? author.getId().toString() : " ") + "]");
+				"Description" + (description != null ? description : "") + " ]");
 	}
 
 	private UUID id;

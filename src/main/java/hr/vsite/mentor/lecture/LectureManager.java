@@ -203,28 +203,22 @@ public class LectureManager {
 		return lecture;
 	}
 	
-	public Lecture delete(UUID lectureId){
+	public Lecture delete(Lecture lecture){
 				
-		if(lectureId == null){
-			Log.info("LectureId for lecture to delete is not provided.");
-			throw new IllegalArgumentException("LectureId for Lecture to delete is not provided.");
-		}
-		
-		Lecture dBLecture = findById(lectureId);
-		if(dBLecture == null){
-			Log.info("Lecture with ID {} does not exist in Database", lectureId.toString());
-			throw new NoSuchElementException("Lecture with ID  "+ lectureId.toString() +" does not exist in Database");
+		if(findById(lecture.getId()) == null){
+			Log.info("Lecture with ID {} does not exist in Database", lecture.getId().toString());
+			throw new NoSuchElementException("Lecture with ID  "+ lecture.getId().toString() +" does not exist in Database");
 		}
 			
 		String query = "DELETE FROM lectures WHERE lecture_id = ?";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
-			statement.setObject(1, lectureId);
+			statement.setObject(1, lecture.getId());
 			if(statement.executeUpdate() == 1){
-				Log.info("Lecture {} deleted", lectureId.toString());
+				Log.info("Lecture deleted {}", lecture.toString());
 			}
 			else{
-				Log.info("Unable to delete Lecture: ID - {}", lectureId.toString());
-				throw new RuntimeException("Unable to delete Lecture: ID - " + lectureId.toString());
+				Log.info("Unable to delete Lecture: ID - {}", lecture.toString());
+				throw new RuntimeException("Unable to delete Lecture: ID - " + lecture.toString());
 			}
 		} 
 		catch (SQLException e) {
@@ -232,7 +226,7 @@ public class LectureManager {
 			throw new RuntimeException("Unable to delete Lecture", e);
 		}
 
-		return dBLecture;
+		return lecture;
 	}
 	
 	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);

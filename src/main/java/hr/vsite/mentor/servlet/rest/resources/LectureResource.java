@@ -85,12 +85,12 @@ public class LectureResource {
 	}
 
 	@DELETE
-	@Path("{lectureId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response delete(@PathParam("lectureId")UUID lectureId){
+	public Response delete(Lecture lecture){
 		
-		return Response.status(200).entity(lectureProvider.get().delete(lectureId)).build();
+		return Response.status(200).entity(lectureProvider.get().delete(lecture)).build();
 	}
 
 
