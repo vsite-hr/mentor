@@ -6,11 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +33,10 @@ public class CourseManager {
 	 */
 	public Course insert(Course course) {
 
-		Log.info("Inserting course \"" + course.getTitle() + "\"...");
+		String msg = String.format("User: %s, Creating Course: %s", userProvider.get().me(), course.toString());
+		Log.trace(msg);
 		if (course.getTitle() == null || course.getDescription() == null || course.getAuthor() == null) {
-			Log.info("Aborted - missing parameter(s)");
-			throw new IllegalArgumentException("Missing parameter(s). Title, description and author are mandatory.");
+			throw new BadRequestException("Error: Missing Parameter(s), " + msg);
 		}
 		String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, ?)";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query,
@@ -43,17 +45,19 @@ public class CourseManager {
 			statement.setString(++index, course.getTitle());
 			statement.setString(++index, course.getDescription());
 			statement.setObject(++index, course.getAuthor().getId());
-			Log.info(statement.executeUpdate() + " records inserted in database");
+			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
 			if (result.next()) {
 				course.setId(UUID.class.cast(result.getObject(1)));
+				Log.info("User: {}, Created Course: {}", userProvider.get().me(), course.toString());
 				return course;
 			}
 			else
-				throw new NoSuchElementException("Database error. Did not return auto-generated course ID.");
+				throw new InternalServerErrorException("Error: Unable To Create Course, " + msg);
 		} catch (SQLException e) {
-			Log.info("Unable to insert course", e);
-			throw new RuntimeException("Unable to insert course", e);
+			if(e.getSQLState().equals("23503")) // Error Name: foreign_key_violation
+				throw new BadRequestException(msg, e);
+			throw new InternalServerErrorException("Error: Unable To Create Course, " + msg, e);
 		}
 
 	}
@@ -62,17 +66,22 @@ public class CourseManager {
 	 * Updates existing <code>Course</code> in database. Returns <code>Course</code>
 	 * if successful.
 	 */
-	public Course update(Course newValues) {
-
-		Log.info("Updating course " + newValues.getId().toString() + "...");
+	public Course update(UUID idToUpdate, Course newValues) {
+		
+		String msg = String.format("User: %s, Updating Course ID: %s With: %s", userProvider.get().me(), idToUpdate.toString(), newValues.toString());
+		Log.trace(msg);
+		if(!idToUpdate.equals(newValues.getId()))
+			throw new BadRequestException("Error: ID Conflict, " + msg);
+		newValues.setId(idToUpdate);
 		if (newValues.getTitle() == null || newValues.getDescription() == null || newValues.getAuthor() == null) {
-			Log.info("Aborted - missing parameter(s)");
-			throw new IllegalArgumentException("Missing parameter(s). Title, description and author are mandatory.");
+			throw new BadRequestException("Error: Missing Parameter(s), " + msg);
 		}
+		
 		if(findById(newValues.getId()) == null) {
 			Log.info("Aborted - no such course exists in database");
-			throw new NoSuchElementException("No such course exists in database.");
+			throw new NotFoundException("Error: No Such Course, " + msg);
 		}
+		
 		String query = "UPDATE courses SET course_title=?, course_description=?, author_id=? WHERE course_id=?";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
 			int index = 0;
@@ -80,35 +89,35 @@ public class CourseManager {
 			statement.setString(++index, newValues.getDescription());
 			statement.setObject(++index, newValues.getAuthor().getId());
 			statement.setObject(++index, newValues.getId());
-			if(statement.executeUpdate() == 1)
-				Log.info("Record successfully updated");
-			return newValues;
+			if(statement.executeUpdate() == 1) {
+				Log.info("User: {}, Updated Course: {}", userProvider.get().me(), newValues.toString());
+				return newValues;
+			}
+			else
+				throw new InternalServerErrorException("Error: Unable To Update Course, " + msg);
 		} catch (SQLException e) {
-			Log.info("Unable to update course", e);
-			throw new RuntimeException("Unable to update course", e);
+			throw new InternalServerErrorException("Error: Unable To Update Course, " + msg, e);
 		}
 	}
 	
 	/**
 	 * Deletes a <code>Course</code> from database.
 	 */
-	public void delete(UUID id) {
+	public void delete(Course course) {
 		
-		Log.info("Deleting course " + id.toString() + "...");
+		String msg = String.format("User: %s, Deleting Course: %s", userProvider.get().me(), course.toString());
+		Log.trace(msg);
 		String query = "DELETE FROM courses WHERE course_id=?";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
 			int index = 0;
-			statement.setObject(++index, id);
+			statement.setObject(++index, course.getId());
 			if(statement.executeUpdate() == 1) {
-				Log.info("Record successfully deleted");
+				Log.info("User: {}, Deleted Course: {}", userProvider.get().me(), course.toString());
 			}
-			else {
-				Log.info("Record does not exist");
-				throw new NoSuchElementException("Record does not exist");
-			}
+			else
+				throw new InternalServerErrorException("Error: Unable To Delete Course, " + msg);
 		} catch (SQLException e) {
-			Log.info("Unable to delete course", e);
-			throw new RuntimeException("Unable to delete course", e);
+			throw new InternalServerErrorException("Error: Unable To Delete Course, " + msg, e);
 		}
 	}
 
@@ -125,7 +134,7 @@ public class CourseManager {
 				return resultSet.next() ? fromResultSet(resultSet) : null;
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Unable to find course with id " + id, e);
+			throw new NotFoundException("Unable to find course with id " + id, e);
 		}
 
 	}
@@ -183,7 +192,7 @@ public class CourseManager {
 					courses.add(fromResultSet(resultSet));
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException("Unable to list courses", e);
+			throw new InternalServerErrorException("Unable to list courses", e);
 		}
 
 		return courses;
@@ -207,7 +216,7 @@ public class CourseManager {
 			course.setDescription(resultSet.getString("course_description"));
 			course.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
 		} catch (SQLException e) {
-			throw new RuntimeException("Unable to resolve course from result set", e);
+			throw new InternalServerErrorException("Unable to resolve course from result set", e);
 		}
 
 		return course;

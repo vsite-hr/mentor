@@ -119,6 +119,12 @@ public class UserManager {
 		
 	}
 	
+	/** Gets logged in user.
+	 */
+	public User me() {
+		return null;
+	}
+	
 	private static final Logger Log = LoggerFactory.getLogger(UserManager.class);
 
 	private final Provider<Connection> connProvider;

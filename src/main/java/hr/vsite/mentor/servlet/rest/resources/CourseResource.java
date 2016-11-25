@@ -71,16 +71,15 @@ public class CourseResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") UUID idToUpdate, Course newValues) {
-		newValues.setId(idToUpdate);
-		return Response.status(200).entity(courseProvider.get().update(newValues)).build();
+		return Response.status(200).entity(courseProvider.get().update(idToUpdate, newValues)).build();
 	}
 	
 	@DELETE
 	@Path("{course}")
 	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response delete(@PathParam("course") UUID idToDelete) {
-		courseProvider.get().delete(idToDelete);
+	public Response delete(@PathParam("course") Course course) {
+		courseProvider.get().delete(course);
 		return Response.status(204).build();
 	}
 

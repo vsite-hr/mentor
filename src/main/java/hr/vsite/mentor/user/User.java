@@ -1,13 +1,25 @@
 package hr.vsite.mentor.user;
 
+import java.nio.file.Path;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import hr.vsite.mentor.MentorConfiguration;
 
 public class User {
 
+	public static Path getDataFolder() {
+		return MentorConfiguration.get().getSubDataPath("user");
+	}
+
+	@JsonProperty
 	public UUID getId() { return id; }
 	public void setId(UUID id) { this.id = id; }
+	@JsonProperty
 	public String getEmail() { return email; }
 	public void setEmail(String email) { this.email = email; }
+	@JsonProperty
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 
@@ -35,7 +47,11 @@ public class User {
 			return false;
 		return true;
 	}
-	
+
+	public Path getPhotoPath() {
+		return getDataFolder().resolve(id + ".jpg");
+	}
+
 	private UUID id;
 	private String email;
 	private String name;

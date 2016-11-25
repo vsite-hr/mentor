@@ -6,6 +6,7 @@
 /bin/
 /build/
 /conf/
+/data/
 /db/psql/db.config
 /src/main/dist/conf/mentor.xml
 /src/main/dist/conf/jdbc.properties
