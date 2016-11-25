@@ -120,7 +120,7 @@ public class LectureManager {
 	
 	public Lecture insert(Lecture lecture){
 		
-		if(lecture.getTitle() == null || lecture.getDescription() == null || lecture.getAuthor().getId() == null) {
+		if(lecture.getTitle() == null || lecture.getDescription() == null || lecture.getAuthor() == null) {
 			Log.info("Aborted - missing parameter(s) in Lecture");
 			throw new IllegalArgumentException("Missing parameter(s). Title, description and authorID are mandatory.");
 		}
@@ -172,7 +172,7 @@ public class LectureManager {
 			queryBuilder.append(" lecture_title = ?,");
 		if(lecture.getDescription() != null)
 			queryBuilder.append(" lecture_description = ?,");
-		if(lecture.getAuthor().getId() != null)
+		if(lecture.getAuthor() != null)
 			queryBuilder.append(" author_id = ?,");
 		queryBuilder.deleteCharAt(queryBuilder.lastIndexOf(","));
 		queryBuilder.append(" WHERE lecture_id = ?");
@@ -183,7 +183,7 @@ public class LectureManager {
 			    statement.setString(++index, lecture.getTitle());
 			if (lecture.getDescription() != null)
 			    statement.setString(++index, lecture.getDescription());
-			if (lecture.getAuthor().getId() != null)
+			if (lecture.getAuthor() != null)
 			    statement.setObject(++index, lecture.getAuthor().getId());
 			statement.setObject(++index, lectureId);
 			
@@ -204,7 +204,7 @@ public class LectureManager {
 	}
 	
 	public Lecture delete(UUID lectureId){
-		
+				
 		if(lectureId == null){
 			Log.info("LectureId for lecture to delete is not provided.");
 			throw new IllegalArgumentException("LectureId for Lecture to delete is not provided.");
