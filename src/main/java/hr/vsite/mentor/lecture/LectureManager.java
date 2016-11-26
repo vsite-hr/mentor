@@ -154,38 +154,44 @@ public class LectureManager {
 	public Lecture update(UUID lectureId, Lecture lecture){
 		
 		if(lecture == null){
-			Log.info("Lecture parameters are not provided.");
-			throw new IllegalArgumentException("Lecture parameters are not provided.");
+			Log.info("Lecture parameters are not provided (Please provide all parameters).");
+			throw new IllegalArgumentException("Lecture parameters are not provided (Please provide all parameters).");
 		}		
 		if(lectureId == null){
 			Log.info("LectureId for Lecture to update is not provided.");
 			throw new IllegalArgumentException("LectureId for Lecture to update is not provided.");
 		}			
 		if(findById(lectureId) == null){
-			Log.info("Lecture with ID {} does not exist in Database", lectureId.toString());
-			throw new NoSuchElementException("Lecture with ID  "+ lectureId.toString() +" does not exist in Database");
+			Log.info("Lecture does not exist in Database: ", lecture.toString());
+			throw new NoSuchElementException("Lecture does not exist in Database: "+ lecture.toString());
 		}
 		
 		StringBuilder queryBuilder = new StringBuilder(1000);
 		queryBuilder.append("UPDATE lectures SET");
-		if(lecture.getTitle() != null)
+		if(lecture.getTitle() != null)				
 			queryBuilder.append(" lecture_title = ?,");
 		if(lecture.getDescription() != null)
 			queryBuilder.append(" lecture_description = ?,");
-		if(lecture.getAuthor() != null)
-			queryBuilder.append(" author_id = ?,");
+		if(lecture.getId() != null)
+			queryBuilder.append(" lecture_id = ?,");
+		if (lecture.getAuthor() != null) 
+			if (lecture.getAuthor().getId() != null)
+				queryBuilder.append(" author_id = ?,");
 		queryBuilder.deleteCharAt(queryBuilder.lastIndexOf(","));
 		queryBuilder.append(" WHERE lecture_id = ?");
 		
 		try (PreparedStatement statement = connProvider.get().prepareStatement(queryBuilder.toString())) {
 			int index = 0;
-			if (lecture.getTitle() != null)
-			    statement.setString(++index, lecture.getTitle());
-			if (lecture.getDescription() != null)
-			    statement.setString(++index, lecture.getDescription());
-			if (lecture.getAuthor() != null)
-			    statement.setObject(++index, lecture.getAuthor().getId());
-			statement.setObject(++index, lectureId);
+			if(lecture.getTitle() != null)
+				statement.setString(++index, lecture.getTitle());
+			if(lecture.getDescription() != null)
+				statement.setString(++index, lecture.getDescription());	
+			if (lecture.getId() != null) 
+				statement.setObject(++index, lecture.getId());			
+			if (lecture.getAuthor() != null) 
+				if (lecture.getAuthor().getId() != null)
+					statement.setObject(++index, lecture.getAuthor().getId());
+			statement.setObject(++index, lectureId);    
 			
 			if(statement.executeUpdate() == 1){
 				Log.info("Lecture {} updated", lectureId.toString());

@@ -79,16 +79,15 @@ public class LectureResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Response update(@PathParam("lectureId")UUID lectureId, Lecture lecture){
-		
-		lectureProvider.get().update(lectureId, lecture);
-		return Response.status(200).entity(lectureProvider.get().findById(lectureId)).build();
+
+		return Response.status(200).entity(lectureProvider.get().update(lectureId, lecture)).build();
 	}
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response delete(Lecture lecture){
+	public Response delete(Lecture lecture){	
 		
 		return Response.status(200).entity(lectureProvider.get().delete(lecture)).build();
 	}
