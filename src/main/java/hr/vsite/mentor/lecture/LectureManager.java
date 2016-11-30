@@ -120,12 +120,7 @@ public class LectureManager {
 	
 	public Lecture insert(Lecture lecture){
 		
-		if(lecture.getTitle() == null || lecture.getDescription() == null || lecture.getAuthor() == null) {
-			Log.info("Aborted - missing parameter(s) in Lecture");
-			throw new IllegalArgumentException("Missing parameter(s). Title, description and authorID are mandatory.");
-		}
-		
-		String query = "INSERT INTO lectures VALUES (DEFAULT, ?, ?, ?)";		
+		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id) VALUES (?, ?, ?)";		
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)){
 			int index = 0;
 			statement.setString(++index, lecture.getTitle());
@@ -185,25 +180,25 @@ public class LectureManager {
 			if(lecture.getTitle() != null)
 				statement.setString(++index, lecture.getTitle());
 			if(lecture.getDescription() != null)
-				statement.setString(++index, lecture.getDescription());	
-			if (lecture.getId() != null) 
+				statement.setString(++index, lecture.getDescription());
+			if (lecture.getId() != null)
 				statement.setObject(++index, lecture.getId());			
-			if (lecture.getAuthor() != null) 
+			if (lecture.getAuthor() != null)
 				if (lecture.getAuthor().getId() != null)
 					statement.setObject(++index, lecture.getAuthor().getId());
-			statement.setObject(++index, lectureId);    
+			statement.setObject(++index, lectureId); 
 			
 			if(statement.executeUpdate() == 1){
-				Log.info("Lecture {} updated", lectureId.toString());
+				Log.info("Lecture {} updated", lectureId);
 			}
 			else{
-				Log.info("Unable to update Lecture: ID - {}", lectureId.toString());
-				throw new RuntimeException("Unable to update Lecture: ID - " + lectureId.toString());
-			}		
-		} 
+				Log.info("Unable to update Lecture: ID - {}", lectureId);
+				throw new RuntimeException("Unable to update Lecture: ID - " + lectureId);
+			}	
+		}
 		catch (SQLException e) {
 			Log.info("Unable to update Lecture ID - {}", lectureId.toString());
-			throw new RuntimeException("Unable to update lecture ID - " + lectureId.toString());
+			throw new RuntimeException("Unable to update lecture ID - " + lectureId);
 		}
 
 		return lecture;
@@ -212,8 +207,8 @@ public class LectureManager {
 	public Lecture delete(Lecture lecture){
 				
 		if(findById(lecture.getId()) == null){
-			Log.info("Lecture with ID {} does not exist in Database", lecture.getId().toString());
-			throw new NoSuchElementException("Lecture with ID  "+ lecture.getId().toString() +" does not exist in Database");
+			Log.info("Lecture with ID {} does not exist in Database", lecture.getId());
+			throw new NoSuchElementException("Lecture with ID  "+ lecture.getId() +" does not exist in Database");
 		}
 			
 		String query = "DELETE FROM lectures WHERE lecture_id = ?";
