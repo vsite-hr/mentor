@@ -75,6 +75,7 @@ public class UserResource {
 			return Response.ok(path.toFile()).build();
 		
 		return Response.ok(ClassLoader.getSystemResourceAsStream("silhouette.jpg")).build();
+//		return Response.ok(getClass().getClassLoader().getResourceAsStream("silhouette.jpg")).build();
 
 	}
 

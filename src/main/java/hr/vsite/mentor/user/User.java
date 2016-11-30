@@ -4,11 +4,13 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gwt.core.shared.GwtIncompatible;
 
 import hr.vsite.mentor.MentorConfiguration;
 
 public class User {
 
+	@GwtIncompatible
 	public static Path getDataFolder() {
 		return MentorConfiguration.get().getSubDataPath("user");
 	}
@@ -48,6 +50,7 @@ public class User {
 		return true;
 	}
 
+	@GwtIncompatible
 	public Path getPhotoPath() {
 		return getDataFolder().resolve(id + ".jpg");
 	}

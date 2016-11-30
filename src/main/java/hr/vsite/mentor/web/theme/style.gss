@@ -1,0 +1,32 @@
+@charset "UTF-8";
+
+/* @sprite .backgroundImage { */
+/* 	gwt-image: "backgroundImage"; */
+/* 	background-color: #333333; */
+/* 	background-position-x: 0%; */
+/* 	background-position-y: 0%; */
+/* } */
+
+.clickable {
+	cursor: pointer;
+}
+
+.monospace {
+	font-family: "Ubuntu Mono", "Andale Mono", "Courier New", "Courier", monospace;
+}
+
+/* @keyframes rotate { */
+/*     from { */
+/*         transform: rotate(360deg); */
+/*     } */
+/*     to {  */
+/*         transform: rotate(0deg); */
+/*     } */
+/* } */
+
+/* .rotate { */
+/*     animation-name: rotate;  */
+/*     animation-duration: 1.5s;  */
+/*     animation-iteration-count: infinite; */
+/*     animation-timing-function: linear; */
+/* } */

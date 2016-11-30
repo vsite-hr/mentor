@@ -1,0 +1,14 @@
+.title {
+	font-size: 1.5em;
+}
+
+.description {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3; /* number of lines to show */
+	-webkit-box-orient: vertical;
+	line-height: 1.4em;     /* fallback */
+	max-height: 4.2em;      /* fallback (-webkit-line-clamp * line-height) */
+	min-height: 4.2em;      /* fallback (-webkit-line-clamp * line-height) */
+}

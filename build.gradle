@@ -1,27 +1,25 @@
-import org.apache.tools.ant.filters.*
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "gradle.plugin.fr.putnami.gwt:putnami-gradle-plugin:0.4.0"
+	}
+}
 
 plugins {
 	id 'java'
 	id 'application'
 	id 'eclipse'
-    id 'org.flywaydb.flyway' version '4.0.3'
+	id 'org.flywaydb.flyway' version '4.0.3'
+	id "fr.putnami.gwt" version "0.4.0"
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
 version = '0.0.0-pre'
 mainClassName = 'hr.vsite.mentor.MentorCmd'
-
-run {
-	classpath += files("${System.env.MENTOR_CONF}", files("${System.properties.MENTOR_CONF}"), "build/conf/main")
-	standardInput = System.in
-}
-
-startScripts {
-	doLast {
-		unixScript.text = unixScript.text.replace('CLASSPATH=', 'CLASSPATH=$MENTOR_CONF:$APP_HOME/conf:') 
-		windowsScript.text = windowsScript.text.replace('set CLASSPATH=', 'set CLASSPATH=%MENTOR_CONF%;%APP_HOME%\\conf;')
-	}
-}
 
 repositories {
     jcenter()
@@ -53,12 +51,22 @@ dependencies {
 			'com.fasterxml.jackson.core:jackson-core:2.8.4',
 			'com.fasterxml.jackson.core:jackson-databind:2.8.4',
 			'com.fasterxml.jackson.core:jackson-annotations:2.8.4',
-			'javax.transaction:javax.transaction-api:1.2'
-			
+			'javax.transaction:javax.transaction-api:1.2',
+
+			// should be in compileOnly group, but it has issues with Putnami (https://github.com/Putnami/putnami-gradle-plugin/issues/37)
+			'org.fusesource.restygwt:restygwt:2.2.0',
+			'com.github.nmorel.gwtjackson:gwt-jackson:0.14.1',	// for RestyGWT, but it depends on too old version
+			'com.github.gwtmaterialdesign:gwt-material:2.0-rc3',
+			'com.github.gwtmaterialdesign:gwt-material-addins:2.0-rc3',
+			'com.github.gwtmaterialdesign:gwt-material-themes:2.0-rc3',
+			'com.github.gwtmaterialdesign:gwt-material-jquery:1.0-rc3',
+			'com.github.gwtmaterialdesign:gwt-material-table:1.0-rc3'
 
 	runtime	'org.postgresql:postgresql:9.4.1211.jre7'
 
-	provided 'javax.servlet:javax.servlet-api:3.1.0'
+	provided	'javax.servlet:javax.servlet-api:3.1.0'
+	
+//	compileOnly	'org.fusesource.restygwt:restygwt:2.2.0',
 
 }
 
@@ -83,7 +91,42 @@ distributions {
 }
 
 processResources {
-    filter ReplaceTokens, tokens: ['version': project.version]
+	filesMatching("**/*.properties") {
+		expand version: version
+	}
+}
+
+putnami {
+	module 'hr.vsite.mentor.web.Mentor'
+	googlePluginEclipse = true
+	gwtVersion = '2.8.0'
+	compile {
+		sourceLevel = JavaVersion.VERSION_1_8
+		logLevel = 'INFO'
+		style = 'OBF'
+		optimize = 9
+		localWorkers = Runtime.getRuntime().availableProcessors()
+		localWorkersMem = 2048
+		maxHeapSize = '512M'
+		war = 'build/war/main'
+		deploy = 'build/war/main/WEB-INF/deploy'
+	}
+}
+
+run {
+	classpath += files("${System.env.MENTOR_CONF}", files("${System.properties.MENTOR_CONF}"), "build/conf/main")
+	standardInput = System.in
+}
+
+startScripts {
+	doLast {
+		unixScript.text = unixScript.text.replace('CLASSPATH=', 'CLASSPATH=$MENTOR_CONF:$APP_HOME/conf:') 
+		windowsScript.text = windowsScript.text.replace('set CLASSPATH=', 'set CLASSPATH=%MENTOR_CONF%;%APP_HOME%\\conf;')
+	}
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
 }
 
 task processConf(type: Copy) {
@@ -105,10 +148,6 @@ task processWar(type: Copy) {
 
 classes {
     classes.dependsOn processConf, processWar
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.1'
 }
 
 build.dependsOn flywayMigrate

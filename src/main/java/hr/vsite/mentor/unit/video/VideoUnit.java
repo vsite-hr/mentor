@@ -11,8 +11,8 @@ public abstract class VideoUnit extends Unit {
 	}
 
 	@Override
-	public VideoUnitAttributes getAttributes() { return VideoUnitAttributes.class.cast(super.getAttributes()); }
+	public VideoUnitAttributes getAttributes() { return (VideoUnitAttributes) super.getAttributes(); }
 	@Override
-	public void setAttributes(Object attributes) { super.setAttributes(VideoUnitAttributes.class.cast(attributes)); }
+	public void setAttributes(Object attributes) { super.setAttributes((VideoUnitAttributes) attributes); }
 	
 }

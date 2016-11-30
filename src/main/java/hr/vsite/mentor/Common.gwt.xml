@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.8.0//EN" "http://gwtproject.org/doctype/2.8.0/gwt-module.dtd">
+
+<module>
+
+	<source path="course">
+		<include name="Course.java"/>
+	</source>
+
+	<source path="lecture">
+		<include name="Lecture.java"/>
+	</source>
+
+	<source path="unit">
+		<include name="Unit.java"/>
+	</source>
+
+	<source path="unit/text">
+		<include name="MarkupType.java"/>
+		<include name="MentorTextUnit.java"/>
+		<include name="MentorTextUnitAttributes.java"/>
+		<include name="TextUnit.java"/>
+		<include name="TextUnitAttributes.java"/>
+	</source>
+
+	<source path="unit/video">
+		<include name="MentorVideoUnit.java"/>
+		<include name="MentorVideoUnitAttributes.java"/>
+		<include name="VideoUnit.java"/>
+		<include name="VideoUnitAttributes.java"/>
+	</source>
+
+	<source path="user">
+		<include name="User.java"/>
+	</source>
+
+</module>

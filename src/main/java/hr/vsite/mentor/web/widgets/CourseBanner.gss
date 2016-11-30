@@ -1,0 +1,21 @@
+.view {
+	margin: 20px;
+	padding: 20px;
+}
+
+.title {
+	font-size: 5em;
+	margin: 10px;
+	line-height: 110%;
+	overflow: hidden;
+}
+
+.image {
+	max-height: 150px;
+	float: right;
+	margin: 10px;
+	border: grey 1px solid;
+}
+
+.description {
+}

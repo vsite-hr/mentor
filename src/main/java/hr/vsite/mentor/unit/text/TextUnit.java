@@ -11,8 +11,8 @@ public abstract class TextUnit extends Unit {
 	}
 
 	@Override
-	public TextUnitAttributes getAttributes() { return TextUnitAttributes.class.cast(super.getAttributes()); }
+	public TextUnitAttributes getAttributes() { return (TextUnitAttributes) super.getAttributes(); }
 	@Override
-	public void setAttributes(Object attributes) { super.setAttributes(TextUnitAttributes.class.cast(attributes)); }
+	public void setAttributes(Object attributes) { super.setAttributes((TextUnitAttributes) attributes); }
 	
 }

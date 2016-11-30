@@ -1,0 +1,13 @@
+.view {
+	background-color: #F6F6F6;
+	margin-top: 20px;
+}
+
+.title {
+	font-size: 5em;
+	margin: 20px;
+}
+
+.image {
+	width: 100%;
+}

@@ -1,0 +1,52 @@
+{
+	"name": "Mentor",
+	"icons": [
+		{
+			"src": "mentor16.png",
+			"sizes": "16x16",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor20.png",
+			"sizes": "20x20",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor24.png",
+			"sizes": "24x24",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor32.png",
+			"sizes": "32x32",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor48.png",
+			"sizes": "48x48",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor64.png",
+			"sizes": "64x64",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor128.png",
+			"sizes": "128x128",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor256.png",
+			"sizes": "256x256",
+			"type": "image/png"
+		},
+		{
+			"src": "mentor512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	],
+	"start_url": "index.html",
+	"display": "standalone"
+}
