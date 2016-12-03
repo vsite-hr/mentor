@@ -1,8 +1,10 @@
 package hr.vsite.mentor.lecture;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gwt.dom.client.Style.Unit;
 
 import hr.vsite.mentor.user.User;
 
@@ -20,6 +22,10 @@ public class Lecture {
 	@JsonProperty
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
+	@JsonProperty
+	public List<String> getLectureKeywords() { return lectureKeywords; }
+	public void setLectureKeywords(List<String> keywords) { this.lectureKeywords = keywords; }
+
 	
 	@Override
 	public int hashCode() {
@@ -49,14 +55,14 @@ public class Lecture {
 	@Override
 	public String toString(){
 		return ("[id: " + (id != null ? id.toString() : "") + ", " +
-				"title:" + (title != null ? title : "") + ", " +
-				"Description" + (description != null ? description : "") + " ]");
+				"title:" + (title != null ? title : "") + "]");
 	}
 
 	private UUID id;
 	private String title;
 	private String description;
 	private User author;
+	private List<String> lectureKeywords;
 	// TODO thumbnail?
 
 }
