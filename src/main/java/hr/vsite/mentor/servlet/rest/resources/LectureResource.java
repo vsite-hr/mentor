@@ -77,13 +77,15 @@ public class LectureResource {
 	}
 	
 	@PUT
-	@Path("{lectureId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response update(@PathParam("lectureId")UUID lectureId, Lecture lecture){
+	public Response update(@QueryParam("lecture")Lecture lectureBefore, Lecture lectureAfter){
+		
+		if(lectureBefore == null)
+			throw new IllegalArgumentException("Unable to update Lecture, please provide existing lecture_id !!");
 
-		return Response.status(200).entity(lectureProvider.get().update(lectureId, lecture)).build();
+		return Response.status(200).entity(lectureProvider.get().update(lectureBefore, lectureAfter)).build();
 	}
 
 	@DELETE
