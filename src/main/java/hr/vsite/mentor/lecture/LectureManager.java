@@ -1,5 +1,6 @@
 package hr.vsite.mentor.lecture;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +15,11 @@ import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
+//import gwt.material.design.jscore.client.api.Array;
 import hr.vsite.mentor.Mentor;
+import hr.vsite.mentor.db.JdbcUtils;
 import hr.vsite.mentor.user.UserManager;
 
 public class LectureManager {
@@ -110,6 +115,7 @@ public class LectureManager {
 			lecture.setTitle(resultSet.getString("lecture_title"));
 			lecture.setDescription(resultSet.getString("lecture_description"));
 			lecture.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
+			lecture.setLectureKeywords(JdbcUtils.array2List(resultSet.getArray("lecture_keywords"), String[].class));
 		} 
 		catch (SQLException e) {
 			throw new RuntimeException("Unable to resolve lectures from result set", e);
@@ -118,25 +124,38 @@ public class LectureManager {
 		return lecture;
 	}
 	
-	public Lecture insert(Lecture lecture){
+	public Lecture insert(LectureFilter filter, Lecture lecture){
 		
-		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id) VALUES (?, ?, ?)";		
-		try (PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)){
+		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id, lecture_keywords) VALUES (?, ?, ?, ?)";	
+		
+		try {
+			PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 			int index = 0;
 			statement.setString(++index, lecture.getTitle());
 			statement.setString(++index, lecture.getDescription());
-			statement.setObject(++index, lecture.getAuthor().getId());			
-			statement.executeUpdate();
+			statement.setObject(++index, lecture.getAuthor().getId());	
+			statement.setArray(++index, connProvider.get().createArrayOf("text", lecture.getLectureKeywords().toArray()));
+			if(statement.executeUpdate() == 0)
+				throw new SQLException("Something went wrong during insert operation");
 			ResultSet resultSet = statement.getGeneratedKeys();
-			
+
 			if(resultSet.next()){
 				lecture.setId(UUID.class.cast(resultSet.getObject("lecture_id")));
-				Log.info("New Lecture inserted: {}", lecture.toString());
+				
+				// Creating relation Lecture -> Course
+				if(filter.getCourse() != null){
+				index = 0;
+				query = "INSERT INTO course_lectures (course_id, lecture_id, lecture_ordinal) VALUES (?, ?, (SELECT COUNT(*) FROM course_lectures WHERE course_id = ?) + 1)";
+				statement = connProvider.get().prepareStatement(query);
+				statement.setObject(++index, filter.getCourse().getId());
+				statement.setObject(++index, lecture.getId());
+				statement.setObject(++index, filter.getCourse().getId());
+				if(statement.executeUpdate() == 0)
+					throw new SQLException("Unable to create relation: Lecture -> Course");
+				}
 			}
-			else{
-				Log.info("getGeneratedKeys(), Did not return auto-generated key for last inserted Lecture: {}", lecture.toString());
+			else
 				throw new NoSuchElementException("getGeneratedKeys(), Did not return auto-generated key for last inserted Lecture.");
-			}
 		} 
 		catch (SQLException e) {
 			Log.info("Unable to insert Lecture: ", e);

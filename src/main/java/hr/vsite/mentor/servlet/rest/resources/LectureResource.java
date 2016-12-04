@@ -68,9 +68,12 @@ public class LectureResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response insert(Lecture lecture){
+	public Response insert(@QueryParam("course") Course course, Lecture lecture){
 		
-		return Response.status(201).entity(lectureProvider.get().insert(lecture)).build();
+		LectureFilter filter = new LectureFilter();
+		filter.setCourse(course);
+		
+		return Response.status(201).entity(lectureProvider.get().insert(filter, lecture)).build();
 	}
 	
 	@PUT
