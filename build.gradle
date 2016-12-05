@@ -105,8 +105,9 @@ putnami {
 		logLevel = 'INFO'
 		style = 'OBF'
 		optimize = 9
-		localWorkers = Runtime.getRuntime().availableProcessors()
-		localWorkersMem = 2048
+		//incremental = true
+		//localWorkers = Runtime.getRuntime().availableProcessors() // Putnami ignores this and calculates on the fly from localWorkersMem and currently available memory
+		localWorkersMem = 2048	// MB
 		maxHeapSize = '512M'
 		war = 'build/war/main'
 		deploy = 'build/war/main/WEB-INF/deploy'
