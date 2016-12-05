@@ -5,9 +5,13 @@
 
 .title {
 	font-size: 5em;
-	margin: 10px;
 	line-height: 110%;
 	overflow: hidden;
+}
+@media only screen and (min-width: 601px) {
+	.title {
+		margin: 10px;
+	}
 }
 
 .image {
@@ -17,5 +21,17 @@
 	border: grey 1px solid;
 }
 
-.description {
+.caption {
+	text-align: left;
 }
+@media only screen and (min-width: 601px) {
+	.caption {
+		text-align: right;
+	}
+}
+
+.text {
+	
+}
+
+

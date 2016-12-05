@@ -34,7 +34,8 @@ public class CourseBanner extends Composite {
 		String view();
 		String title();
 		String image();
-		String description();
+		String caption();
+		String text();
 	}
 	
 	public CourseBanner() {
@@ -66,36 +67,34 @@ public class CourseBanner extends Composite {
 		view.add(titleRow);
 			MaterialRow lecturerRow = new MaterialRow();
 				MaterialColumn lecturerCaptionColumn = new MaterialColumn();
-				lecturerCaptionColumn.setGrid("s6 m4 l3");
+				lecturerCaptionColumn.setGrid("s12 m4 l3");
 					MaterialLabel lecturerCaption = new MaterialLabel("Predavač:");
 					lecturerCaption.setTextColor(Color.GREY_LIGHTEN_1);
-					lecturerCaption.setTextAlign(TextAlign.RIGHT);
+					lecturerCaption.addStyleName(res.style().caption());
 					lecturerCaption.addStyleName("flow-text");
 				lecturerCaptionColumn.add(lecturerCaption);
 			lecturerRow.add(lecturerCaptionColumn);
 				MaterialColumn lecturerNameColumn = new MaterialColumn();
-				lecturerNameColumn.setGrid("s6 m8 l9");
+				lecturerNameColumn.setGrid("s12 m8 l9");
 					lecturerName = new MaterialLabel();
 					lecturerName.setTextColor(Color.GREY_DARKEN_1);
-					lecturerName.setTextAlign(TextAlign.LEFT);
 					lecturerName.addStyleName("flow-text");
 				lecturerNameColumn.add(lecturerName);
 			lecturerRow.add(lecturerNameColumn);
 		view.add(lecturerRow);
 			MaterialRow descriptionRow = new MaterialRow();
 				MaterialColumn descriptionCaptionColumn = new MaterialColumn();
-				descriptionCaptionColumn.setGrid("s6 m4 l3");
+				descriptionCaptionColumn.setGrid("s12 m4 l3");
 					MaterialLabel descriptionCaption = new MaterialLabel("Opis:");
 					descriptionCaption.setTextColor(Color.GREY_LIGHTEN_1);
-					descriptionCaption.setTextAlign(TextAlign.RIGHT);
+					descriptionCaption.addStyleName(res.style().caption());
 					descriptionCaption.addStyleName("flow-text");
 				descriptionCaptionColumn.add(descriptionCaption);
 			descriptionRow.add(descriptionCaptionColumn);
 				MaterialColumn descriptionColumn = new MaterialColumn();
-				descriptionColumn.setGrid("s6 m8 l9");
+				descriptionColumn.setGrid("s12 m8 l9");
 					description = new MaterialLabel();
 					description.setTextColor(Color.GREY_DARKEN_1);
-					description.setTextAlign(TextAlign.LEFT);
 					description.addStyleName("flow-text");
 				descriptionColumn.add(description);
 			descriptionRow.add(descriptionColumn);

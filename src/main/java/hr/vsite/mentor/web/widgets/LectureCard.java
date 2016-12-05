@@ -53,8 +53,8 @@ public class LectureCard extends MaterialCard {
 		
 		MaterialCardAction cardAction = new MaterialCardAction();
 		cardAction.setTextAlign(TextAlign.RIGHT);
-			lecturesLink = new MaterialLink();
-		cardAction.add(lecturesLink);
+			unitsLink = new MaterialLink();
+		cardAction.add(unitsLink);
 		add(cardAction);
 		
 		//image.addClickHandler(e -> Places.controller().goTo(new LecturePlace(this.lecture.getId())));	// TODO
@@ -67,21 +67,21 @@ public class LectureCard extends MaterialCard {
 
 		this.lecture = lecture;
 		
-		String courseHref = "#"/* + Places.mapper().getToken(new LecturePlace(lecture.getId()))*/;	// TODO
+		String lectureHref = "#"/* + Places.mapper().getToken(new LecturePlace(lecture.getId()))*/;	// TODO
 		
 		image.setUrl("https://www.vsite.hr/sites/default/files/promocija2015_027.JPG");	// TODO
 		title.setText(lecture.getTitle());
-		title.setHref(courseHref);
+		title.setHref(lectureHref);
 		description.setText(lecture.getDescription());
-		lecturesLink.setText("13 units");	// TODO
-		lecturesLink.setHref(courseHref);
+		unitsLink.setText("13 units");	// TODO
+		unitsLink.setHref(lectureHref);
 		
 	}
 
 	private final MaterialImage image;
 	private final MaterialLink title;
 	private final MaterialLabel description;
-	private final MaterialLink lecturesLink;
+	private final MaterialLink unitsLink;
 	private Lecture lecture = null;
 	
 	private static final Resources res = GWT.create(Resources.class);

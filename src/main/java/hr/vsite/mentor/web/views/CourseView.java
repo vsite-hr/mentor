@@ -14,7 +14,7 @@ import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.web.Loader;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.CourseBanner;
-import hr.vsite.mentor.web.widgets.LectureCard;
+import hr.vsite.mentor.web.widgets.LectureWidget;
 
 import gwt.material.design.client.constants.ProgressType;
 import gwt.material.design.client.ui.MaterialColumn;
@@ -63,10 +63,10 @@ public class CourseView extends Composite {
 		view.add(bannerRow);
 			MaterialRow lecturesRow = new MaterialRow();
 				MaterialColumn lecturesColumn = new MaterialColumn();
-				lecturesColumn.setGrid("s12 m10");
-				lecturesColumn.setOffset("s0 m1");
-					lecturesContainerRow = new MaterialRow();
-				lecturesColumn.add(lecturesContainerRow);
+				lecturesColumn.setGrid("s12 m12 l8");
+				lecturesColumn.setOffset("l2");
+					lecturesContainer = new MaterialPanel();
+				lecturesColumn.add(lecturesContainer);
 			lecturesRow.add(lecturesColumn);
 		view.add(lecturesRow);
 		
@@ -81,7 +81,7 @@ public class CourseView extends Composite {
 	public void init(UUID courseId) {
 
 		courseBanner.setVisible(false);
-		lecturesContainerRow.clear();
+		lecturesContainer.clear();
 
 		Loader<LoadComponent> loader = Loader.start(LoadComponent.class)
 			.setCancelOnError(true)
@@ -113,15 +113,12 @@ public class CourseView extends Composite {
 					return;
 				}
 				for (Lecture lecture : lectures) {
-					MaterialColumn column = new MaterialColumn();
-					column.setGrid("s12 m6 l3");
-						LectureCard card = new LectureCard(lecture);
-					column.add(card);
-					lecturesContainerRow.add(column);
+					LectureWidget widget = new LectureWidget(lecture);
+					lecturesContainer.add(widget);
 				}
 				MaterialAnimation animation = new MaterialAnimation();
 		        animation.setTransition(Transition.SHOW_GRID);
-		        animation.animate(lecturesContainerRow);
+		        animation.animate(lecturesContainer);
 				loader.success(LoadComponent.Lectures);
 			}
 			@Override
@@ -134,7 +131,7 @@ public class CourseView extends Composite {
 	}
 
 	private final CourseBanner courseBanner;
-	private final MaterialRow lecturesContainerRow;
+	private final MaterialPanel lecturesContainer;
 	
 	private static CourseView instance = null;
 	
