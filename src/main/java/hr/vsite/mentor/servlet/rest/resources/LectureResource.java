@@ -1,6 +1,7 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -80,19 +81,21 @@ public class LectureResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response update(@QueryParam("lecture")Lecture lectureBefore, Lecture lectureAfter){
+	public Response update(@QueryParam("lecture") Lecture lectureBefore, Lecture lectureAfter){
 		
 		if(lectureBefore == null)
-			throw new IllegalArgumentException("Unable to update Lecture, please provide existing lecture_id !!");
+			throw new NoSuchElementException("Unable to update Lecture, please provide other lecture_id !!");
 
 		return Response.status(200).entity(lectureProvider.get().update(lectureBefore, lectureAfter)).build();
 	}
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response delete(Lecture lecture){	
+	public Response delete(@QueryParam("lecture") Lecture lecture){	
+		
+		if(lecture == null)
+			throw new NoSuchElementException("Unable to delete Lecture, please provide other lecture_id !!");
 		
 		return Response.status(200).entity(lectureProvider.get().delete(lecture)).build();
 	}

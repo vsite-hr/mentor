@@ -1,10 +1,13 @@
 package hr.vsite.mentor.lecture;
 
 import java.sql.Array;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLDataException;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -158,8 +161,8 @@ public class LectureManager {
 				throw new SQLException("getGeneratedKeys(), Did not return auto-generated key for last inserted Lecture.");
 		} 
 		catch (SQLException e) {
-			Log.info("Unable to insert Lecture: ", e);
-			throw new RuntimeException("Unable to insert Lecture", e);
+			Log.info("Unable to insert Lecture: " + e.getMessage());
+			throw new RuntimeException("Unable to insert Lecture" + e.getMessage());
 		}
 		
 		return lecture;
@@ -182,8 +185,8 @@ public class LectureManager {
 				throw new SQLException("Something went wrong during insert operation");
 		}
 		catch (SQLException e) {
-			Log.info("Unable to update Lecture: ", e);
-			throw new RuntimeException("Unable to update lecture: ", e);
+			Log.info("Unable to update Lecture: " + e.getMessage());
+			throw new RuntimeException("Unable to update lecture: " + e.getMessage());
 		}
 
 		lectureAfter.setId(lectureBefore.getId());
@@ -192,25 +195,29 @@ public class LectureManager {
 	
 	public Lecture delete(Lecture lecture){
 				
-		if(findById(lecture.getId()) == null){
-			Log.info("Lecture with ID {} does not exist in Database", lecture.getId());
-			throw new NoSuchElementException("Lecture with ID  "+ lecture.getId() +" does not exist in Database");
-		}
+		String query = "SELECT course_id FROM course_lectures WHERE lecture_id = ?";
 			
-		String query = "DELETE FROM lectures WHERE lecture_id = ?";
-		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
+		try {
+			PreparedStatement statement = connProvider.get().prepareStatement(query);
 			statement.setObject(1, lecture.getId());
-			if(statement.executeUpdate() == 1){
-				Log.info("Lecture deleted {}", lecture.toString());
-			}
-			else{
-				Log.info("Unable to delete Lecture: ID - {}", lecture.toString());
-				throw new RuntimeException("Unable to delete Lecture: ID - " + lecture.toString());
-			}
+			ResultSet resultSet = statement.executeQuery();
+			if(resultSet.next())
+				throw new SQLException(
+							"Unable to delete Lecture due to foreign key constraint on Course: [" 
+							+resultSet.getObject("course_id")
+							+"] in table course_lectures");
+			
+			statement = connProvider.get().prepareStatement("DELETE FROM lecture_units WHERE lecture_id = ?");
+			statement.setObject(1, lecture.getId());
+			statement.executeUpdate();
+			statement = connProvider.get().prepareStatement("DELETE FROM lectures WHERE lecture_id = ?");
+			statement.setObject(1, lecture.getId());
+			if(statement.executeUpdate() == 0)
+				throw new SQLException("Something went wrong during delete operation");
 		} 
 		catch (SQLException e) {
-			Log.info("Unable to delete Lecture: ", e);
-			throw new RuntimeException("Unable to delete Lecture", e);
+			Log.info("Delete failed: " + e.getMessage());
+			throw new RuntimeException("Delete failed: " + e.getMessage());
 		}
 
 		return lecture;
