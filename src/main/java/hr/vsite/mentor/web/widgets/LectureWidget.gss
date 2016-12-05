@@ -1,22 +1,19 @@
 .view {
  	margin: 0 30px;
-/* 	padding: 20px; */
 }
 
 .title {
 	font-size: 2.5em;
-/* 	margin: 10px; */
 	line-height: 110%;
-/* 	overflow: hidden; */
 }
 
 .image {
-/* 	max-height: 150px; */
-/* 	float: right; */
-/* 	margin: 10px; */
-/* 	border: grey 1px solid; */
 }
 
 .description {
     margin: 10px;
+}
+
+.keyword {
+    margin: 5px;
 }
