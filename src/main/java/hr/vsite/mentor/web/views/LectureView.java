@@ -14,6 +14,7 @@ import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.web.Loader;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.LectureBanner;
+import hr.vsite.mentor.web.widgets.UnitWidget;
 
 import gwt.material.design.client.constants.ProgressType;
 import gwt.material.design.client.ui.MaterialColumn;
@@ -111,11 +112,8 @@ public class LectureView extends Composite {
 					MaterialToast.fireToast("Couldn't load units!");
 					return;
 				}
-				for (Unit unit : units) {
-					// TODO
-//					LectureWidget widget = new LectureWidget(lecture);
-//					unitsContainer.add(widget);
-				}
+				for (Unit unit : units)
+					unitsContainer.add(UnitWidget.create(unit));
 				MaterialAnimation animation = new MaterialAnimation();
 		        animation.setTransition(Transition.SHOW_GRID);
 		        animation.animate(unitsContainer);

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
@@ -38,6 +39,8 @@ public class MentorModule extends AbstractModule {
 	@Provides
 	@Singleton
 	ObjectMapper provideObjectMapper() {
+		SimpleModule module = new SimpleModule();
+        module.setSerializerModifier(new MentorSerializerModifier());
 		return new ObjectMapper()
 			.configure(SerializationFeature.WRAP_ROOT_VALUE, false)
 			.configure(SerializationFeature.INDENT_OUTPUT, false)
@@ -50,6 +53,7 @@ public class MentorModule extends AbstractModule {
 			.disable(MapperFeature.AUTO_DETECT_IS_GETTERS)
 			.setSerializationInclusion(Include.NON_NULL)
 			.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
+			.registerModule(module)
 			;
 	}
 

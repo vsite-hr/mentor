@@ -14,24 +14,3 @@
 	}
 }
 
-.image {
-	max-height: 150px;
-	float: right;
-	margin: 10px;
-	border: grey 1px solid;
-}
-
-.caption {
-	text-align: left;
-}
-@media only screen and (min-width: 601px) {
-	.caption {
-		text-align: right;
-	}
-}
-
-.text {
-	
-}
-
-

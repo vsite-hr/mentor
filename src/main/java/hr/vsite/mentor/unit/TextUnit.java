@@ -1,8 +1,15 @@
 package hr.vsite.mentor.unit;
 
+import java.io.IOException;
+
 import org.apache.commons.lang3.NotImplementedException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.google.gwt.core.shared.GwtIncompatible;
 
 public class TextUnit extends Unit {
@@ -21,6 +28,25 @@ public class TextUnit extends Unit {
 		
 	}
 
+	@GwtIncompatible
+	public static class Serializer extends JsonSerializer<TextUnit> {
+		public Serializer(JsonSerializer<TextUnit> defaultSerializer) {
+            this.defaultSerializer = defaultSerializer;
+        }
+		@Override
+		public void serialize(TextUnit value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+			// since we are using type info, this is not called, but we need it anyway
+	        value.getHtml();	// ensure HTML is calculated
+	        defaultSerializer.serialize(value, jgen, provider);
+		}
+		@Override
+		public void serializeWithType(TextUnit value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
+			value.getHtml();	// ensure HTML is calculated
+			defaultSerializer.serializeWithType(value, gen, serializers, typeSer);
+		}
+		private final JsonSerializer<TextUnit> defaultSerializer;
+	}
+	
 	public static enum MarkupType {
 		None,
 		Markdown
@@ -30,6 +56,10 @@ public class TextUnit extends Unit {
 	public Attributes getAttributes() { return (Attributes) super.getAttributes(); }
 	@Override
 	public void setAttributes(Object attributes) { super.setAttributes((Attributes) attributes); }
+
+	@JsonProperty("html")
+	public String getHtmlSnapshot() { return html; }
+	public void setHtmlSnapshot(String html) { this.html = html; }	// only for JOSN deserialization purposes
 
 	@GwtIncompatible
 	public String getHtml() {
@@ -55,5 +85,4 @@ public class TextUnit extends Unit {
 
 	private String html;	// lazy eval
 	
-
 }

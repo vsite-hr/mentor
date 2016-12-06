@@ -7,16 +7,9 @@ import com.google.gwt.user.client.ui.Composite;
 
 import gwt.material.design.client.constants.Color;
 import gwt.material.design.client.constants.HideOn;
-import gwt.material.design.client.constants.TextAlign;
-import gwt.material.design.client.constants.WavesType;
-import gwt.material.design.client.ui.MaterialCard;
-import gwt.material.design.client.ui.MaterialCardAction;
-import gwt.material.design.client.ui.MaterialCardContent;
-import gwt.material.design.client.ui.MaterialCardImage;
 import gwt.material.design.client.ui.MaterialColumn;
 import gwt.material.design.client.ui.MaterialImage;
 import gwt.material.design.client.ui.MaterialLabel;
-import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialRow;
 
@@ -101,25 +94,6 @@ public class CourseBanner extends Composite {
 		view.add(descriptionRow);
 
 		initWidget(view);
-		
-//		MaterialCardImage cardImage = new MaterialCardImage();
-//		cardImage.setWaves(WavesType.LIGHT);
-//			image = new MaterialImage();
-//		cardImage.add(image);
-//		add(cardImage);
-//		
-//		MaterialCardContent cardContent = new MaterialCardContent();
-//		cardContent.add(title);
-//			description = new MaterialLabel();
-//			description.addStyleName(res.style().description());
-//		cardContent.add(description);
-//		add(cardContent);
-		
-//		MaterialCardAction cardAction = new MaterialCardAction();
-//		cardAction.setTextAlign(TextAlign.RIGHT);
-//			lecturesLink = new MaterialLink();
-//		cardAction.add(lecturesLink);
-//		add(cardAction);
 		
 		if (course != null)
 			setCourse(course);

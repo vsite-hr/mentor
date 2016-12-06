@@ -112,10 +112,8 @@ public class CourseView extends Composite {
 					MaterialToast.fireToast("Couldn't load lectures!");
 					return;
 				}
-				for (Lecture lecture : lectures) {
-					LectureWidget widget = new LectureWidget(lecture);
-					lecturesContainer.add(widget);
-				}
+				for (Lecture lecture : lectures)
+					lecturesContainer.add(new LectureWidget(lecture));
 				MaterialAnimation animation = new MaterialAnimation();
 		        animation.setTransition(Transition.SHOW_GRID);
 		        animation.animate(lecturesContainer);

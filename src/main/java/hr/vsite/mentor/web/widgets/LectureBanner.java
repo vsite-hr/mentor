@@ -24,9 +24,6 @@ public class LectureBanner extends Composite {
 	public interface Style extends CssResource {
 		String view();
 		String title();
-		String image();
-		String caption();
-		String text();
 	}
 	
 	public LectureBanner() {
@@ -59,25 +56,6 @@ public class LectureBanner extends Composite {
 		view.add(descriptionRow);
 
 		initWidget(view);
-		
-//		MaterialCardImage cardImage = new MaterialCardImage();
-//		cardImage.setWaves(WavesType.LIGHT);
-//			image = new MaterialImage();
-//		cardImage.add(image);
-//		add(cardImage);
-//		
-//		MaterialCardContent cardContent = new MaterialCardContent();
-//		cardContent.add(title);
-//			description = new MaterialLabel();
-//			description.addStyleName(res.style().description());
-//		cardContent.add(description);
-//		add(cardContent);
-		
-//		MaterialCardAction cardAction = new MaterialCardAction();
-//		cardAction.setTextAlign(TextAlign.RIGHT);
-//			lecturesLink = new MaterialLink();
-//		cardAction.add(lecturesLink);
-//		add(cardAction);
 		
 		if (lecture != null)
 			setLecture(lecture);
