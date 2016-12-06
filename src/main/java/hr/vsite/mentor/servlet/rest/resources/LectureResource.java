@@ -24,6 +24,7 @@ import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.lecture.LectureFilter;
 import hr.vsite.mentor.lecture.LectureManager;
+import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.user.User;
 
 @Path("lectures")
@@ -59,10 +60,22 @@ public class LectureResource {
 	public Lecture findById(@PathParam("lectureId") Lecture lectureId) {
 
 		if (lectureId == null)
-			throw new NotFoundException();
+			throw new NoSuchElementException("Unable to resolve Lecture, please provide other lecture_id !!");
 
 		return lectureId;
 
+	}
+	
+	@GET
+	@Path("{lectureId}/headUnit")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Unit getHeadUnit(@PathParam("lectureId") Lecture lectureId){
+		
+		if(lectureId == null)
+			throw new NoSuchElementException("Unable to resolve lectureHeadUnit, please provide other lecture_id !!");
+		
+		return lectureProvider.get().getHeadUnit(lectureId.getId());
 	}
 
 	@POST

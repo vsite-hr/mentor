@@ -23,13 +23,16 @@ import com.google.common.collect.Lists;
 //import gwt.material.design.jscore.client.api.Array;
 import hr.vsite.mentor.Mentor;
 import hr.vsite.mentor.db.JdbcUtils;
+import hr.vsite.mentor.unit.Unit;
+import hr.vsite.mentor.unit.UnitManager;
 import hr.vsite.mentor.user.UserManager;
 
 public class LectureManager {
 
 	@Inject
-	public LectureManager(Provider<UserManager> userProvider, Provider<Connection> connProvider) {
+	public LectureManager(Provider<UserManager> userProvider, Provider<Connection> connProvider, Provider<UnitManager> unitProvider) {
 		this.userProvider = userProvider;
+		this.unitProvider = unitProvider;
 		this.connProvider = connProvider;
 	}
 
@@ -105,6 +108,28 @@ public class LectureManager {
 	    return lectures;	
 	}
 	
+	public Unit getHeadUnit(UUID lectureId){
+		
+		Unit headUnit = null;
+		String query = "SELECT * FROM units u WHERE EXISTS (SELECT 1 FROM lectures l WHERE u.unit_id = l.lecture_head_unit_id AND l.lecture_id = ?)";
+		
+		try(PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, lectureId);
+			
+			try(ResultSet resultSet = statement.executeQuery()){
+				if(!resultSet.next())
+					throw new SQLException("This Lecture does not have headUnit !!");
+			
+				headUnit = unitProvider.get().fromResultSet(resultSet);
+			}
+		}
+		catch(SQLException e){
+			Log.info("Unable to resolve lectureHeadUnit: " + e.getMessage());
+			throw new RuntimeException("Unable to resolve lectureHeadUnit: " + e.getMessage());
+		}
+		return headUnit;
+	}
+	
 	/** Parses given ResultSet and extract {@link Lectures} from it.
 	 * If ResultSet had <code>NULL</code> in <code>Lectures_id</code> column, <code>null</code> is returned. */
 	public Lecture lectureFromResultSet(ResultSet resultSet) {
@@ -140,6 +165,9 @@ public class LectureManager {
 			statement.setArray(++index, connProvider.get().createArrayOf("text", lecture.getKeywords().toArray()));
 			if(statement.executeUpdate() == 0)
 				throw new SQLException("Something went wrong during insert operation");
+			try(ResultSet result = statement.getGeneratedKeys()){
+				lecture.setId(UUID.class.cast(result.getObject("lectur_id")));
+			}
 		}			
 		catch (SQLException e) {
 			Log.info("Unable to insert Lecture: " + e.getMessage());
@@ -206,6 +234,7 @@ public class LectureManager {
 	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
 
 	private final Provider<UserManager> userProvider;
+	private final Provider<UnitManager> unitProvider;
 	private final Provider<Connection> connProvider;
 	
 }
