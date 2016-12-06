@@ -12,6 +12,7 @@
 /src/main/dist/conf/jdbc.properties
 /src/main/dist/conf/jetty.xml
 /src/main/dist/conf/logback.xml
+/src/main/java/hr/vsite/mentor/Sandbox.java
 /work/
 /gradle.properties
 /gradle-app.setting

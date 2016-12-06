@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hr.vsite.mentor.db.JdbcUtils;
+import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.user.UserManager;
 
 public class UnitManager {
@@ -97,6 +98,30 @@ public class UnitManager {
 	        }
 		} catch (SQLException e) {
 			throw new RuntimeException("Unable to list units", e);
+		}
+		
+	    return units;
+
+	}
+
+	/** Returns all units for given {@link Lecture} in proper order.*/
+	public List<Unit> list(Lecture lecture) {
+		
+		List<Unit> units = new ArrayList<>();
+		
+		try (PreparedStatement statement = connProvider.get().prepareStatement(
+			"SELECT * FROM lecture_units" +
+			"	JOIN units ON lecture_units.unit_id = units.unit_id" +
+			"	WHERE lecture_units.lecture_id = ?" +
+			"	ORDER BY lecture_units.unit_ordinal ASC"
+		)) {
+		    statement.setObject(1, lecture.getId());
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	        	while(resultSet.next())
+	        		units.add(fromResultSet(resultSet));
+	        }
+		} catch (SQLException e) {
+			throw new RuntimeException("Unable to list units for lecture " + lecture, e);
 		}
 		
 	    return units;

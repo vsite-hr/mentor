@@ -74,6 +74,11 @@ public abstract class Unit {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return "Unit [id=" + id + ", type=" + type + ", title=" + title + "]";
+	}
+
 	private UUID id;
 	private Type type;
 	private String title;
