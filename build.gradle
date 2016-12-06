@@ -112,6 +112,28 @@ putnami {
 		war = 'build/war/main'
 		deploy = 'build/war/main/WEB-INF/deploy'
 	}
+	dev {
+		bindAddress = "0.0.0.0"
+		failOnError = false
+		precompile = false
+		incremental = true
+		//port = 9876
+		sourceLevel = JavaVersion.VERSION_1_8
+		logLevel = "INFO"	/* (ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL) */
+		generateJsInteropExports = true
+		methodNameDisplayMode = "NONE"	/* Emit extra information allow chrome dev tools to display Java identifiers in many places instead of JavaScript functions. (NONE, ONLY_METHOD_NAME, ABBREVIATED, FULL) */
+		strict = false
+		noServer = true
+		war = 'build/war/main'
+		//extraArgs = ["-Dgwt.persistentunitcachedir=build/sdm"]
+		/** Java args */
+		maxHeapSize = "1024m"
+		minHeapSize = "512m"
+		//debugJava = true
+		//debugPort = 8000
+		//debugSuspend = false
+		//javaArgs = ["-Xmx1024m", "-Xms256m"]
+    }	
 }
 
 run {
