@@ -92,8 +92,8 @@ public class LectureWidget extends Composite {
 //		unitsLink.setHref(lectureHref);
 		
 		keywordsContainer.clear();
-		if (lecture.getLectureKeywords() != null)
-			for (String keyword : lecture.getLectureKeywords()) {
+		if (lecture.getKeywords() != null)
+			for (String keyword : lecture.getKeywords()) {
 				MaterialChip chip = new MaterialChip(keyword);
 				chip.addStyleName(res.style().keyword());
 				keywordsContainer.add(chip);
