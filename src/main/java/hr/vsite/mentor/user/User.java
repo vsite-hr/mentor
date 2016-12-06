@@ -4,10 +4,12 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.gwt.core.shared.GwtIncompatible;
 
 import hr.vsite.mentor.MentorConfiguration;
 
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public class User {
 
 	@GwtIncompatible

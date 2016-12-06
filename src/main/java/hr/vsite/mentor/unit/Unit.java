@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import hr.vsite.mentor.MentorConfiguration;
 import hr.vsite.mentor.user.User;
 
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public abstract class Unit {
 
 	public static enum Type {
