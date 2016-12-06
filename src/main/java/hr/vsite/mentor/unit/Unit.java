@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.gwt.core.shared.GwtIncompatible;
 
 import hr.vsite.mentor.MentorConfiguration;
 import hr.vsite.mentor.user.User;
@@ -23,6 +24,7 @@ public abstract class Unit {
 		YouTube
 	}
 	
+	@GwtIncompatible
 	public static Path getDataFolder() {
 		return MentorConfiguration.get().getSubDataPath("unit");
 	}
@@ -47,6 +49,7 @@ public abstract class Unit {
 	public void setAttributes(Object attributes) { this.attributes = attributes; }
 
 	/** Override if derived unit can provide thumbnail */
+	@GwtIncompatible
 	public Path getThumbnailPath() { return null; }
 
 	@Override

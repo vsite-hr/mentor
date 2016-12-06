@@ -39,7 +39,6 @@ public class UnitResource {
 	}
 	
 	@GET
-	@Path("list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public List<Unit> list(

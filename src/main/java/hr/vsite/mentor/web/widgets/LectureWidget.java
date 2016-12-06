@@ -6,6 +6,8 @@ import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.user.client.ui.Composite;
 
 import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.web.Places;
+import hr.vsite.mentor.web.places.LecturePlace;
 
 import gwt.material.design.client.constants.Color;
 import gwt.material.design.client.ui.MaterialChip;
@@ -81,7 +83,7 @@ public class LectureWidget extends Composite {
 
 		this.lecture = lecture;
 		
-		String lectureHref = "#"/* + Places.mapper().getToken(new LecturePlace(lecture.getId()))*/;	// TODO
+		String lectureHref = "#" + Places.mapper().getToken(new LecturePlace(lecture.getId()));
 		
 		title.setText(lecture.getTitle());
 		title.setHref(lectureHref);

@@ -72,7 +72,7 @@ public class UnitManager {
 		if (filter.getAuthor() != null)
 			queryBuilder.append(" AND author_id = ?");
 		if (filter.getLecture() != null)
-			queryBuilder.append(" AND lecture_id = ?");
+			queryBuilder.append(" AND EXISTS (SELECT 1 FROM lecture_units WHERE units.unit_id = lecture_units.unit_id AND lecture_units.lecture_id = ?)");
 		if (count != null)
 			queryBuilder.append(" LIMIT ?");
 		if (offset != null)
@@ -102,6 +102,22 @@ public class UnitManager {
 		
 	    return units;
 
+	}
+
+	/** Returns units count for given {@link Lecture}.*/
+	public int count(Lecture lecture) {
+		
+		try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT COUNT(*) FROM lecture_units WHERE lecture_id = ?")) {
+		    statement.setObject(1, lecture.getId());
+	        try (ResultSet resultSet = statement.executeQuery()) {
+	        	if (!resultSet.next())
+	        		throw new SQLException("Empty ResultSet?!");
+	        	return resultSet.getInt(1);
+	        }
+		} catch (SQLException e) {
+			throw new RuntimeException("Unable to count units for lecture " + lecture, e);
+		}
+		
 	}
 
 	/** Returns all units for given {@link Lecture} in proper order.*/

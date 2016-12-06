@@ -13,22 +13,23 @@ import org.fusesource.restygwt.client.RestService;
 
 import com.google.gwt.http.client.Request;
 
-import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.unit.Unit;
 
-public interface LectureService extends RestService {
+public interface UnitService extends RestService {
 
 	@GET
 	public Request list(
+		@QueryParam("type") Unit.Type type,
 		@QueryParam("title") String title,
 		@QueryParam("author") UUID authorId,
-		@QueryParam("course") UUID courseId,
+		@QueryParam("lecture") UUID lectureId,
 		@QueryParam("count") Integer count,
 		@QueryParam("offset") Integer offset,
-		MethodCallback<List<Lecture>> callback);
+		MethodCallback<List<Unit>> callback);
 
 	@GET
-	@Path("{lecture}")
-	public Request findById(@PathParam("lecture") UUID lectureId, MethodCallback<Lecture> callback);
+	@Path("{unit}")
+	public Request findById(@PathParam("unit") UUID unitId, MethodCallback<Unit> callback);
 
 //	@GET
 //	@Path("{client}/roads")

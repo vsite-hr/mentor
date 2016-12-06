@@ -31,6 +31,14 @@ public class Api {
 		return lectureService;
 	}
 	
+	public UnitService unit() {
+		if (unitService == null) {
+			unitService = GWT.create(UnitService.class);
+			((RestServiceProxy) unitService).setResource(getResource("/units"));
+		}
+		return unitService;
+	}
+	
 	private Resource getResource(String path) {
 		return new Resource(GWT.getModuleBaseURL() + "../api" + (path.startsWith("/") ? "" : "/") + path);
 	}
@@ -39,5 +47,6 @@ public class Api {
 	
 	private CourseService courseService = null;
 	private LectureService lectureService = null;
+	private UnitService unitService = null;
 	
 }

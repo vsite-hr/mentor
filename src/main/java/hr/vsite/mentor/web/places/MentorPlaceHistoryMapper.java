@@ -5,7 +5,8 @@ import com.google.gwt.place.shared.WithTokenizers;
 
 @WithTokenizers({
 	WelcomePlace.Tokenizer.class,
-	CoursePlace.Tokenizer.class
+	CoursePlace.Tokenizer.class,
+	LecturePlace.Tokenizer.class
 })
 public interface MentorPlaceHistoryMapper extends PlaceHistoryMapper {
 
