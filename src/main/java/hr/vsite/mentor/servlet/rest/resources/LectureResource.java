@@ -69,12 +69,9 @@ public class LectureResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response insert(@QueryParam("course") Course course, Lecture lecture){
-		
-		LectureFilter filter = new LectureFilter();
-		filter.setCourse(course);
-		
-		return Response.status(201).entity(lectureProvider.get().insert(filter, lecture)).build();
+	public Response insert(Lecture lecture){
+				
+		return Response.status(201).entity(lectureProvider.get().insert(lecture)).build();
 	}
 	
 	@PUT
@@ -83,10 +80,10 @@ public class LectureResource {
 	@Transactional
 	public Response update(@QueryParam("lecture") Lecture lectureBefore, Lecture lectureAfter){
 		
-		if(lectureBefore == null)
+		if(lectureBefore == null || lectureBefore.getId() != lectureAfter.getId())
 			throw new NoSuchElementException("Unable to update Lecture, please provide other lecture_id !!");
 
-		return Response.status(200).entity(lectureProvider.get().update(lectureBefore, lectureAfter)).build();
+		return Response.status(200).entity(lectureProvider.get().update(lectureBefore.getId(), lectureAfter)).build();
 	}
 
 	@DELETE

@@ -23,8 +23,8 @@ public class Lecture {
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
 	@JsonProperty
-	public List<String> getLectureKeywords() { return lectureKeywords; }
-	public void setLectureKeywords(List<String> keywords) { this.lectureKeywords = keywords; }
+	public List<String> getKeywords() { return keywords; }
+	public void setKeywords(List<String> keywords) { this.keywords = keywords; }
 
 	
 	@Override
@@ -62,7 +62,7 @@ public class Lecture {
 	private String title;
 	private String description;
 	private User author;
-	private List<String> lectureKeywords;
+	private List<String> keywords;
 	// TODO Add lecture_head_unit_id (insert(), update())
 	// TODO thumbnail?
 

@@ -118,7 +118,7 @@ public class LectureManager {
 			lecture.setTitle(resultSet.getString("lecture_title"));
 			lecture.setDescription(resultSet.getString("lecture_description"));
 			lecture.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
-			lecture.setLectureKeywords(JdbcUtils.array2List(resultSet.getArray("lecture_keywords"), String[].class));
+			lecture.setKeywords(JdbcUtils.array2List(resultSet.getArray("lecture_keywords"), String[].class));
 		} 
 		catch (SQLException e) {
 			throw new RuntimeException("Unable to resolve lectures from result set", e);
@@ -127,7 +127,7 @@ public class LectureManager {
 		return lecture;
 	}
 	
-	public Lecture insert(LectureFilter filter, Lecture lecture){
+	public Lecture insert(Lecture lecture){
 		
 		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id, lecture_keywords) VALUES (?, ?, ?, ?)";	
 		
@@ -137,29 +137,10 @@ public class LectureManager {
 			statement.setString(++index, lecture.getTitle());
 			statement.setString(++index, lecture.getDescription());
 			statement.setObject(++index, lecture.getAuthor().getId());	
-			statement.setArray(++index, connProvider.get().createArrayOf("text", lecture.getLectureKeywords().toArray()));
+			statement.setArray(++index, connProvider.get().createArrayOf("text", lecture.getKeywords().toArray()));
 			if(statement.executeUpdate() == 0)
 				throw new SQLException("Something went wrong during insert operation");
-			ResultSet resultSet = statement.getGeneratedKeys();
-
-			if(resultSet.next()){
-				lecture.setId(UUID.class.cast(resultSet.getObject("lecture_id")));
-				
-				// Creating relation Lecture -> Course
-				if(filter.getCourse() != null){
-				index = 0;
-				query = "INSERT INTO course_lectures (course_id, lecture_id, lecture_ordinal) VALUES (?, ?, (SELECT COUNT(*) FROM course_lectures WHERE course_id = ?) + 1)";
-				statement = connProvider.get().prepareStatement(query);
-				statement.setObject(++index, filter.getCourse().getId());
-				statement.setObject(++index, lecture.getId());
-				statement.setObject(++index, filter.getCourse().getId());
-				if(statement.executeUpdate() == 0)
-					throw new SQLException("Unable to create relation: Lecture -> Course");
-				}
-			}
-			else
-				throw new SQLException("getGeneratedKeys(), Did not return auto-generated key for last inserted Lecture.");
-		} 
+		}			
 		catch (SQLException e) {
 			Log.info("Unable to insert Lecture: " + e.getMessage());
 			throw new RuntimeException("Unable to insert Lecture" + e.getMessage());
@@ -168,7 +149,7 @@ public class LectureManager {
 		return lecture;
 	}
 	
-	public Lecture update(Lecture lectureBefore, Lecture lectureAfter){
+	public Lecture update(UUID lectureBeforeId, Lecture lectureAfter){
 		
 		String query = "UPDATE lectures SET lecture_title = ?, lecture_description = ?, author_id = ?, lecture_keywords = ? WHERE lecture_id = ?";
 		
@@ -178,8 +159,8 @@ public class LectureManager {
 			statement.setString(++index, lectureAfter.getTitle());
 			statement.setString(++index, lectureAfter.getDescription());
 			statement.setObject(++index, lectureAfter.getAuthor().getId());
-			statement.setArray(++index, connProvider.get().createArrayOf("text", lectureAfter.getLectureKeywords().toArray()));
-			statement.setObject(++index, lectureBefore.getId());
+			statement.setArray(++index, connProvider.get().createArrayOf("text", lectureAfter.getKeywords().toArray()));
+			statement.setObject(++index, lectureBeforeId);
 			
 			if(statement.executeUpdate() == 0)
 				throw new SQLException("Something went wrong during insert operation");
@@ -189,7 +170,6 @@ public class LectureManager {
 			throw new RuntimeException("Unable to update lecture: " + e.getMessage());
 		}
 
-		lectureAfter.setId(lectureBefore.getId());
 		return lectureAfter;
 	}
 	
