@@ -20,12 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hr.vsite.mentor.db.JdbcUtils;
-import hr.vsite.mentor.unit.text.MentorTextUnit;
-import hr.vsite.mentor.unit.text.MentorTextUnitAttributes;
-import hr.vsite.mentor.unit.text.TextUnitAttributes;
-import hr.vsite.mentor.unit.video.MentorVideoUnit;
-import hr.vsite.mentor.unit.video.MentorVideoUnitAttributes;
-import hr.vsite.mentor.unit.video.VideoUnitAttributes;
 import hr.vsite.mentor.user.UserManager;
 
 public class UnitManager {
@@ -120,31 +114,13 @@ public class UnitManager {
 			String attributesAsString = resultSet.getString("unit_attributes");
 			switch (type) {
 				case Text: {
-					TextUnitAttributes attributes = mapper.readValue(attributesAsString, TextUnitAttributes.class);
-					switch (attributes.getTextUnitType()) {
-						case Mentor:
-							unit = new MentorTextUnit();
-							unit.setAttributes(mapper.readValue(attributesAsString, MentorTextUnitAttributes.class));
-							break;
-						case GoogleDoc:
-							throw new NotImplementedException("GoogleDoc text unit not implemented");
-						case Open365:
-							throw new NotImplementedException("Open365 text unit not implemented");
-					}
+					unit = new TextUnit();
+					unit.setAttributes(mapper.readValue(attributesAsString, TextUnit.Attributes.class));
 					break;
 				}
 				case Video:
-					VideoUnitAttributes attributes = mapper.readValue(attributesAsString, VideoUnitAttributes.class);
-					switch (attributes.getVideoUnitType()) {
-						case Mentor:
-							unit = new MentorVideoUnit();
-							unit.setAttributes(mapper.readValue(attributesAsString, MentorVideoUnitAttributes.class));
-							break;
-						case YouTube:
-							throw new NotImplementedException("YouTube video unit not implemented");
-						case Vimeo:
-							throw new NotImplementedException("Vimeo video unit not implemented");
-					}
+					unit = new VideoUnit();
+					unit.setAttributes(mapper.readValue(attributesAsString, VideoUnit.Attributes.class));
 					break;
 				case Audio:
 					throw new NotImplementedException("Audio unit not implemented");
@@ -154,12 +130,14 @@ public class UnitManager {
 					throw new NotImplementedException("Quiz unit not implemented");
 				case Series:
 					throw new NotImplementedException("Series unit not implemented");
+				case YouTube:
+					throw new NotImplementedException("YouTube unit not implemented");
 			}
 	
 			if (unit == null)
 				throw new IllegalArgumentException("Unknown unit type: " + type);
 	
-			unit.setUnitType(type);
+			unit.setType(type);
 
 			unit.setId(UUID.class.cast(resultSet.getObject("unit_id")));
 			unit.setTitle(resultSet.getString("unit_title"));
@@ -169,7 +147,7 @@ public class UnitManager {
 			return unit;
 
 		} catch (SQLException | IOException e) {
-			throw new RuntimeException("Unable to resolve text unit from result set", e);
+			throw new RuntimeException("Unable to resolve unit from result set", e);
 		}
 
 	}

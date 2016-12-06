@@ -17,7 +17,8 @@ public abstract class Unit {
 		Audio,
 		Image,
 		Quiz,
-		Series
+		Series,
+		YouTube
 	}
 	
 	public static Path getDataFolder() {
@@ -28,8 +29,8 @@ public abstract class Unit {
 	public UUID getId() { return id; }
 	public void setId(UUID id) { this.id = id; }
 	@JsonProperty
-	public Type getUnitType() { return unitType; }
-	public void setUnitType(Type unitType) { this.unitType = unitType; }
+	public Type getType() { return type; }
+	public void setType(Type type) { this.type = type; }
 	@JsonProperty
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
@@ -72,7 +73,7 @@ public abstract class Unit {
 	}
 	
 	private UUID id;
-	private Type unitType;
+	private Type type;
 	private String title;
 	private User author;
 	private List<String> keywords;

@@ -1,15 +1,35 @@
-package hr.vsite.mentor.unit.text;
+package hr.vsite.mentor.unit;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gwt.core.shared.GwtIncompatible;
 
-public class MentorTextUnit extends TextUnit {
+public class TextUnit extends Unit {
+
+	public static class Attributes {
+
+		@JsonProperty
+		public MarkupType getMarkupType() { return markupType; }
+		public void setMarkupType(MarkupType markupType) { this.markupType = markupType; }
+		@JsonProperty
+		public String getMarkup() { return markup; }
+		public void setMarkup(String markup) { this.markup = markup; }
+		
+		private MarkupType markupType;
+		private String markup;
+		
+	}
+
+	public static enum MarkupType {
+		None,
+		Markdown
+	}
 
 	@Override
-	public MentorTextUnitAttributes getAttributes() { return (MentorTextUnitAttributes) super.getAttributes(); }
+	public Attributes getAttributes() { return (Attributes) super.getAttributes(); }
 	@Override
-	public void setAttributes(Object attributes) { super.setAttributes((MentorTextUnitAttributes) attributes); }
+	public void setAttributes(Object attributes) { super.setAttributes((Attributes) attributes); }
 
 	@GwtIncompatible
 	public String getHtml() {
@@ -35,4 +55,5 @@ public class MentorTextUnit extends TextUnit {
 
 	private String html;	// lazy eval
 	
+
 }

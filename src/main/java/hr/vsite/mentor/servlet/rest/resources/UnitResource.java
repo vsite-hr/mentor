@@ -27,7 +27,7 @@ import hr.vsite.mentor.servlet.rest.NioMediaStreamer;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.UnitFilter;
 import hr.vsite.mentor.unit.UnitManager;
-import hr.vsite.mentor.unit.video.MentorVideoUnit;
+import hr.vsite.mentor.unit.VideoUnit;
 import hr.vsite.mentor.user.User;
 
 @Path("units")
@@ -104,8 +104,8 @@ public class UnitResource {
 		if (unit == null)
 			throw new NotFoundException();
 
-		if (MentorVideoUnit.class.isInstance(unit)) {
-			java.nio.file.Path path = MentorVideoUnit.class.cast(unit).getVideoPath();
+		if (VideoUnit.class.isInstance(unit)) {
+			java.nio.file.Path path = VideoUnit.class.cast(unit).getVideoPath();
 			if (path == null || !Files.exists(path))
 				throw new WebApplicationException("Missing content for MentorVideoUnit " + unit);
 			return Response.ok(null, "video/mp4").status(206)
@@ -116,7 +116,7 @@ public class UnitResource {
 
 		// TODO if unit is of external type and we can redirect to another url, make it so
 		
-		throw new NotAcceptableException("Unsupported HEAD request for content of unit " + unit + " (" + unit.getUnitType() + ")");
+		throw new NotAcceptableException("Unsupported HEAD request for content of unit " + unit + " (" + unit.getType() + ")");
 		
     }
 
@@ -130,8 +130,8 @@ public class UnitResource {
 		if (unit == null)
 			throw new NotFoundException();
 
-		if (MentorVideoUnit.class.isInstance(unit)) {
-			java.nio.file.Path path = MentorVideoUnit.class.cast(unit).getVideoPath();
+		if (VideoUnit.class.isInstance(unit)) {
+			java.nio.file.Path path = VideoUnit.class.cast(unit).getVideoPath();
 			if (path == null || !Files.exists(path))
 				throw new WebApplicationException("Missing content for MentorVideoUnit " + unit);
 			long length = Files.size(path);
@@ -166,7 +166,7 @@ public class UnitResource {
 			
 		// TODO if unit is of external type and we can redirect to another url, make it so
 		
-		throw new NotAcceptableException("Unsupported GET request for content of unit " + unit + " (" + unit.getUnitType() + ")");
+		throw new NotAcceptableException("Unsupported GET request for content of unit " + unit + " (" + unit.getType() + ")");
 		
 	}
 	
