@@ -64,7 +64,6 @@ public class Lecture {
 	private String description;
 	private User author;
 	private List<String> keywords;
-	// TODO Add lecture_head_unit_id (insert(), update())
 	// TODO thumbnail?
 
 }
