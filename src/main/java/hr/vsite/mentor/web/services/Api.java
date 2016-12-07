@@ -18,7 +18,7 @@ public class Api {
 	public CourseService course() {
 		if (courseService == null) {
 			courseService = GWT.create(CourseService.class);
-			((RestServiceProxy) courseService).setResource(getResource("/courses"));
+			((RestServiceProxy) courseService).setResource(getResource("courses"));
 		}
 		return courseService;
 	}
@@ -26,7 +26,7 @@ public class Api {
 	public LectureService lecture() {
 		if (lectureService == null) {
 			lectureService = GWT.create(LectureService.class);
-			((RestServiceProxy) lectureService).setResource(getResource("/lectures"));
+			((RestServiceProxy) lectureService).setResource(getResource("lectures"));
 		}
 		return lectureService;
 	}
@@ -34,13 +34,13 @@ public class Api {
 	public UnitService unit() {
 		if (unitService == null) {
 			unitService = GWT.create(UnitService.class);
-			((RestServiceProxy) unitService).setResource(getResource("/units"));
+			((RestServiceProxy) unitService).setResource(getResource("units"));
 		}
 		return unitService;
 	}
 	
 	private Resource getResource(String path) {
-		return new Resource(GWT.getModuleBaseURL() + "../api" + (path.startsWith("/") ? "" : "/") + path);
+		return new Resource(GWT.getHostPageBaseURL() + "api/" + path);
 	}
 	
 	private static Api instance = null;

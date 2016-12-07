@@ -7,8 +7,10 @@ import com.google.gwt.user.client.ui.Composite;
 
 import hr.vsite.mentor.unit.TextUnit;
 import hr.vsite.mentor.unit.Unit;
+import hr.vsite.mentor.unit.VideoUnit;
 
 import gwt.material.design.client.constants.Color;
+import gwt.material.design.client.ui.MaterialBadge;
 import gwt.material.design.client.ui.MaterialColumn;
 import gwt.material.design.client.ui.MaterialLabel;
 import gwt.material.design.client.ui.MaterialPanel;
@@ -19,7 +21,7 @@ public abstract class UnitWidget extends Composite {
 	public static UnitWidget create(Unit unit) {
 		switch (unit.getType()) {
 			case Text: return new TextUnitWidget((TextUnit) unit);
-			case Video: return new UnknownUnitWidget(unit);
+			case Video: return new VideoUnitWidget((VideoUnit) unit);
 			case Audio: return new UnknownUnitWidget(unit);
 			case Image: return new UnknownUnitWidget(unit);
 			case Quiz: return new UnknownUnitWidget(unit);
@@ -38,7 +40,9 @@ public abstract class UnitWidget extends Composite {
 	public interface Style extends CssResource {
 	    String DefaultCss = "hr/vsite/mentor/web/widgets/UnitWidget.gss";
 		String view();
+		String titlePanel();
 		String title();
+		String badge();
 		String content();
 	}
 	
@@ -49,21 +53,29 @@ public abstract class UnitWidget extends Composite {
 		view.setShadow(1);
 		view.setHoverable(true);
 		view.addStyleName(res.style().view());
-			MaterialRow titleRow = new MaterialRow();
-			titleRow.setBackgroundColor(Color.RED_LIGHTEN_2);
-			titleRow.setPadding(5);
-				MaterialColumn titleColumn = new MaterialColumn();
-				titleColumn.setGrid("s12");
-					title = new MaterialLabel();
-					title.addStyleName(res.style().title());
-					title.setTextColor(Color.GREY_LIGHTEN_3);
-				titleColumn.add(title);
-			titleRow.add(titleColumn);
-		view.add(titleRow);
+			titlePanel = new MaterialPanel();
+			titlePanel.setBackgroundColor(Color.RED_LIGHTEN_2);
+			titlePanel.addStyleName(res.style().titlePanel());
+				title = new MaterialLabel();
+				title.addStyleName(res.style().title());
+				title.setTextColor(Color.GREY_LIGHTEN_3);
+			titlePanel.add(title);
+		view.add(titlePanel);
+//			MaterialRow titleRow = new MaterialRow();
+//			titleRow.setBackgroundColor(Color.RED_LIGHTEN_2);
+//			titleRow.setPadding(5);
+//				MaterialColumn titleColumn = new MaterialColumn();
+//				titleColumn.setGrid("s12");
+//					title = new MaterialLabel();
+//					title.addStyleName(res.style().title());
+//					title.setTextColor(Color.GREY_LIGHTEN_3);
+//				titleColumn.add(title);
+//			titleRow.add(titleColumn);
+//		view.add(titleRow);
 			contentRow = new MaterialRow();
 			contentRow.addStyleName(res.style().content());
 		view.add(contentRow);
-		
+
 		initWidget(view);
 		
 	}
@@ -78,8 +90,10 @@ public abstract class UnitWidget extends Composite {
 		
 	}
 
+	protected MaterialPanel getTitlePanel() { return titlePanel; }
 	protected MaterialRow getContentRow() { return contentRow; }
 
+	private final MaterialPanel titlePanel;
 	private final MaterialLabel title;
 	private final MaterialRow contentRow;
 	private Unit unit = null;
