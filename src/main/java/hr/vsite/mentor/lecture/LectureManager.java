@@ -117,16 +117,15 @@ public class LectureManager {
 			statement.setObject(1, lectureId);
 			
 			try(ResultSet resultSet = statement.executeQuery()){
-				if(!resultSet.next())
-					throw new SQLException("This Lecture does not have headUnit !!");
-			
-				headUnit = unitProvider.get().fromResultSet(resultSet);
+				if(resultSet.next())
+					headUnit = unitProvider.get().fromResultSet(resultSet);			
 			}
 		}
 		catch(SQLException e){
 			Log.info("Unable to resolve lectureHeadUnit: " + e.getMessage());
 			throw new RuntimeException("Unable to resolve lectureHeadUnit: " + e.getMessage());
 		}
+		
 		return headUnit;
 	}
 	
