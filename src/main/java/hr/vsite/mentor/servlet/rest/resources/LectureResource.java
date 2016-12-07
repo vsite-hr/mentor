@@ -1,6 +1,5 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
-import java.nio.file.Files;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -71,34 +70,12 @@ public class LectureResource {
 	@Path("{lectureId}/headUnit")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Unit getHeadUnit(@PathParam("lectureId") Lecture lecture){
+	public Unit getHeadUnit(@PathParam("lectureId") Lecture lectureId){
 		
-		if(lecture == null)
+		if(lectureId == null)
 			throw new NoSuchElementException("Unable to resolve lectureHeadUnit, please provide other lecture_id !!");
 		
-		Unit headUnit = lectureProvider.get().getHeadUnit(lecture.getId());
-		if(headUnit == null)
-			throw new NoSuchElementException("Lecture doesn't have headUnit");
-		
-		return headUnit;
-	}
-	
-	@GET
-	@Path("{lectureId}/thumbnail")
-	@Transactional
-		
-		if(lecture == null)
-			throw new NoSuchElementException("Unable to resolve thumbnail, please provide other lecture_id !!");
-		
-		Unit headUnit = lectureProvider.get().getHeadUnit(lecture.getId());
-		
-		if(headUnit != null){
-			java.nio.file.Path path = headUnit.getThumbnailPath();
-			if (path != null && Files.exists(path))
-				return Response.ok(path.toFile(), "image/jpeg").build();
-		}
-		
-		return Response.ok(ClassLoader.getSystemResourceAsStream("lecture.jpg"), "image/jpeg").build();
+		return lectureProvider.get().getHeadUnit(lectureId.getId());
 	}
 
 	@POST
