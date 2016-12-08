@@ -17,12 +17,12 @@ public class LectureActivity extends AbstractActivity {
 	@Override
 	public void start(final AcceptsOneWidget containerWidget, EventBus eventBus) {
 
-		if (place.getLectureId() == null) {
+		if (place.getLectureId() == null || place.getCourseId() == null) {
 			Places.goHome();
 			return;
 		}
 		
-		LectureView.get().init(place.getLectureId());
+		LectureView.get().init(place.getCourseId(), place.getLectureId());
 		LectureView.get().show(containerWidget);
 		
 	}

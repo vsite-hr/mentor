@@ -4,9 +4,9 @@
 }
 
 .title {
-	font-size: 5em;
-	line-height: 110%;
-	overflow: hidden;
+	overflow-wrap: break-word;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 @media only screen and (min-width: 601px) {
 	.title {

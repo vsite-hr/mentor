@@ -3,17 +3,18 @@ package hr.vsite.mentor.web.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
-import com.google.gwt.user.client.ui.Composite;
 
 import gwt.material.design.client.constants.Color;
+import gwt.material.design.client.constants.HeadingSize;
 import gwt.material.design.client.ui.MaterialColumn;
 import gwt.material.design.client.ui.MaterialLabel;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialRow;
+import gwt.material.design.client.ui.html.Heading;
 
 import hr.vsite.mentor.lecture.Lecture;
 
-public class LectureBanner extends Composite {
+public class LectureBanner extends MaterialPanel {
 
 	public interface Resources extends ClientBundle {
 		@Source("LectureBanner.gss")
@@ -32,31 +33,30 @@ public class LectureBanner extends Composite {
 	
 	public LectureBanner(Lecture lecture) {
 	
-		MaterialPanel view = new MaterialPanel();
-		view.setBackgroundColor(Color.WHITE);
-		view.setShadow(1);
-		view.addStyleName(res.style().view());
-			MaterialRow titleRow = new MaterialRow();
-				MaterialColumn titleColumn = new MaterialColumn();
-				titleColumn.setGrid("s12");
-					title = new MaterialLabel();
-					title.addStyleName(res.style().title());
-					title.setTextColor(Color.BLUE_GREY);
-				titleColumn.add(title);
-			titleRow.add(titleColumn);
-		view.add(titleRow);
-			MaterialRow descriptionRow = new MaterialRow();
-				MaterialColumn descriptionColumn = new MaterialColumn();
-				descriptionColumn.setGrid("s12");
-					description = new MaterialLabel();
-					description.setTextColor(Color.GREY_DARKEN_1);
-					description.addStyleName("flow-text");
-				descriptionColumn.add(description);
-			descriptionRow.add(descriptionColumn);
-		view.add(descriptionRow);
-
-		initWidget(view);
+		setBackgroundColor(Color.WHITE);
+		setShadow(1);
+		addStyleName(res.style().view());
 		
+		MaterialRow titleRow = new MaterialRow();
+			MaterialColumn titleColumn = new MaterialColumn();
+			titleColumn.setGrid("s12");
+				title = new Heading(HeadingSize.H1);
+				title.addStyleName(res.style().title());
+				title.setTextColor(Color.BLUE_GREY);
+			titleColumn.add(title);
+		titleRow.add(titleColumn);
+		add(titleRow);
+		
+		MaterialRow descriptionRow = new MaterialRow();
+			MaterialColumn descriptionColumn = new MaterialColumn();
+			descriptionColumn.setGrid("s12");
+				description = new MaterialLabel();
+				description.setTextColor(Color.GREY_DARKEN_1);
+				description.addStyleName("flow-text");
+			descriptionColumn.add(description);
+		descriptionRow.add(descriptionColumn);
+		add(descriptionRow);
+
 		if (lecture != null)
 			setLecture(lecture);
 
@@ -69,7 +69,7 @@ public class LectureBanner extends Composite {
 		description.setText(lecture.getDescription());
 	}
 
-	private final MaterialLabel title;
+	private final Heading title;
 	private final MaterialLabel description;
 	private Lecture lecture = null;
 	

@@ -1,19 +1,46 @@
 .view {
- 	margin: 0 30px;
+	margin-bottom: 20px;
+}
+
+@external row;
+@external col;
+
+.view .row, .view .col {
+	padding: 0;
+	margin: 0;
+}
+
+.titlePanel {
+	padding: 5px 0.75rem;
 }
 
 .title {
-	font-size: 2.5em;
-	line-height: 110%;
+	overflow-wrap: break-word;
 }
 
 .image {
 }
 
 .description {
-    margin: 10px;
+	-webkit-margin-before: 0;
+	-webkit-margin-after: 0;
+	margin: 1rem;
 }
 
 .keyword {
-    margin: 5px;
+    margin: 5px 5px 5px 0;
+}
+
+.actionsPanel {
+	border-top: 1px solid rgba(160, 160, 160, 0.2);
+	padding: 20px;
+	text-align: right;
+}
+
+.unitsLink {
+	display: inline-block;
+	color: #ffab40 !important;
+	margin-right: 20px;
+	transition: color .3s ease;
+	text-transform: uppercase;
 }

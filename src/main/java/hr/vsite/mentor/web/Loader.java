@@ -14,7 +14,10 @@ import gwt.material.design.client.constants.ProgressType;
 
 public class Loader<E extends Enum<E>> {
 
-	// TODO event for completion
+	@FunctionalInterface
+	public static interface LoadedHandler {
+		void onLoaded();
+	}
 
 	public static <E extends Enum<E>> Loader<E> start(Class<E> clazz) {
 		return start(clazz.getEnumConstants());
@@ -69,6 +72,10 @@ public class Loader<E extends Enum<E>> {
 		return this;
 	}
 	
+	public void setLoadedHandler(LoadedHandler loadedHandler) {
+		this.loadedHandler = loadedHandler;
+	}
+	
 	public Loader<E> success(E component) {
 		if (!requests.containsKey(component))
 			throw new IllegalArgumentException("Unknown loading component: " + component.toString());
@@ -104,7 +111,8 @@ public class Loader<E extends Enum<E>> {
 			return false;
 		if (progress != null)
 			progress.hideProgress();
-		// TODO fire event
+		if (loadedHandler != null && finished.size() == successes.size())
+			loadedHandler.onLoaded();
 		return true;
 	}
 	
@@ -117,5 +125,6 @@ public class Loader<E extends Enum<E>> {
 	private boolean cancelOnError = false;
 	private HasProgress progress = null;
 	private ProgressType progressType = null;
-
+	private LoadedHandler loadedHandler = null;
+	
 }

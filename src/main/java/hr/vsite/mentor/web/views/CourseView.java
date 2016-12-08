@@ -7,24 +7,33 @@ import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 
 import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.web.Loader;
+import hr.vsite.mentor.web.Places;
+import hr.vsite.mentor.web.places.LecturePlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.CourseBanner;
 import hr.vsite.mentor.web.widgets.LectureWidget;
 
+import gwt.material.design.client.constants.HideOn;
+import gwt.material.design.client.constants.IconType;
 import gwt.material.design.client.constants.ProgressType;
 import gwt.material.design.client.ui.MaterialColumn;
+import gwt.material.design.client.ui.MaterialIcon;
+import gwt.material.design.client.ui.MaterialLabel;
+import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialPanel;
+import gwt.material.design.client.ui.MaterialPushpin;
 import gwt.material.design.client.ui.MaterialRow;
+import gwt.material.design.client.ui.MaterialScrollspy;
 import gwt.material.design.client.ui.MaterialToast;
 import gwt.material.design.client.ui.animate.MaterialAnimation;
 import gwt.material.design.client.ui.animate.Transition;
 
-public class CourseView extends Composite {
+public class CourseView extends MaterialPanel {
 
 	private static enum LoadComponent {
 		Course,
@@ -44,34 +53,32 @@ public class CourseView extends Composite {
 //
 //	@CssResource.ImportedWithPrefix("CourseView")
 //	public interface Style extends ApplicationShell.Style {
-//		String view();
-//		String news();
+//		String toc();
 //	}
 	
 	private CourseView() {
 		
-		super();
-
-		MaterialPanel view = new MaterialPanel();
-			MaterialRow bannerRow = new MaterialRow();
-				MaterialColumn bannerColumn = new MaterialColumn();
-				bannerColumn.setGrid("s12 m12 l8");
-				bannerColumn.setOffset("l2");
-					courseBanner = new CourseBanner();
-				bannerColumn.add(courseBanner);
-			bannerRow.add(bannerColumn);
-		view.add(bannerRow);
-			MaterialRow lecturesRow = new MaterialRow();
-				MaterialColumn lecturesColumn = new MaterialColumn();
-				lecturesColumn.setGrid("s12 m12 l8");
-				lecturesColumn.setOffset("l2");
-					lecturesContainer = new MaterialPanel();
-				lecturesColumn.add(lecturesContainer);
-			lecturesRow.add(lecturesColumn);
-		view.add(lecturesRow);
+		MaterialRow row = new MaterialRow();
+			MaterialColumn tocColumn = new MaterialColumn();
+			tocColumn.setGrid("l2");
+			tocColumn.setHideOn(HideOn.HIDE_ON_MED_DOWN);
+				toc = new MaterialScrollspy();
+				toc.addStyleName(ApplicationShell.res().style().toc());
+			tocColumn.add(toc);
+				HTML dummy = new HTML("&nbsp;");	// for column to survive pinning of TOC
+			tocColumn.add(dummy);
+		row.add(tocColumn);
+			MaterialColumn lecturesColumn = new MaterialColumn();
+			lecturesColumn.setGrid("s12 m12 l8");
+				courseBanner = new CourseBanner();
+			lecturesColumn.add(courseBanner);
+				lecturesContainer = new MaterialPanel();
+			lecturesColumn.add(lecturesContainer);
+		row.add(lecturesColumn);
+		add(row);
 		
-		initWidget(view);
-
+		MaterialPushpin.apply(toc, 64.0, 0.0);
+		
 	}
 	
 	public void show(AcceptsOneWidget containerWidget) {
@@ -82,6 +89,9 @@ public class CourseView extends Composite {
 
 		courseBanner.setVisible(false);
 		lecturesContainer.clear();
+		toc.clear();
+
+		// TODO cancel loader if still running
 
 		Loader<LoadComponent> loader = Loader.start(LoadComponent.class)
 			.setCancelOnError(true)
@@ -89,6 +99,7 @@ public class CourseView extends Composite {
 		loader.add(LoadComponent.Course, Api.get().course().findById(courseId, new MethodCallback<Course>() {
 			@Override
 			public void onSuccess(Method method, Course course) {
+				CourseView.this.course = course;
 				if (course == null) {
 					loader.error(LoadComponent.Course);
 					MaterialToast.fireToast("Couldn't load course!");
@@ -107,13 +118,17 @@ public class CourseView extends Composite {
 		loader.add(LoadComponent.Lectures, Api.get().lecture().list(null, null, courseId, 100, 0, new MethodCallback<List<Lecture>>() {
 			@Override
 			public void onSuccess(Method method, List<Lecture> lectures) {
+				CourseView.this.lectures = lectures;
 				if (lectures == null) {
 					loader.error(LoadComponent.Lectures);
 					MaterialToast.fireToast("Couldn't load lectures!");
 					return;
 				}
-				for (Lecture lecture : lectures)
-					lecturesContainer.add(new LectureWidget(lecture));
+				for (Lecture lecture : lectures) {
+					LectureWidget widget = new LectureWidget(course, lecture);
+					//widget.setScrollspy(lecture.getId().toString());	// TODO TOC/Scrollspy does not work
+					lecturesContainer.add(widget);
+				}
 				MaterialAnimation animation = new MaterialAnimation();
 		        animation.setTransition(Transition.SHOW_GRID);
 		        animation.animate(lecturesContainer);
@@ -125,14 +140,28 @@ public class CourseView extends Composite {
 				MaterialToast.fireToast("Couldn't load lectures! " + exception);
 			}
 		}));
-		
+		loader.setLoadedHandler(() -> {
+			toc.add(new MaterialLink("Učionica", ""));
+			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
+			toc.add(new MaterialLabel(course.getTitle()));
+			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
+			for (Lecture lecture : lectures) {
+				MaterialLink tocLink = new MaterialLink(lecture.getTitle(), Places.mapper().getToken(new LecturePlace(course.getId(), lecture.getId())));
+				//tocLink.setHref("#" + lecture.getId());	// TODO TOC/Scrollspy does not work
+				toc.add(tocLink);
+			}
+		});
 	}
 
+	private final MaterialScrollspy toc;
 	private final CourseBanner courseBanner;
 	private final MaterialPanel lecturesContainer;
+
+	private Course course = null;
+	private List<Lecture> lectures = null;
 	
 	private static CourseView instance = null;
-	
+
 //	private static final Resources res = GWT.create(Resources.class);
 //	static {
 //		res.style().ensureInjected();

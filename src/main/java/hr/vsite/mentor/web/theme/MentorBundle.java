@@ -6,8 +6,6 @@ import com.google.gwt.resources.client.CssResource.NotStrict;
 import com.google.gwt.resources.client.GwtCreateResource;
 import com.google.gwt.resources.client.GwtCreateResource.ClassType;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.resources.client.ImageResource.ImageOptions;
-import com.google.gwt.resources.client.ImageResource.RepeatStyle;
 
 public interface MentorBundle extends ClientBundle {
 	
@@ -21,15 +19,7 @@ public interface MentorBundle extends ClientBundle {
 	@ClassType(MentorMessages.class)
 	GwtCreateResource<MentorMessages> messagesFactory();
 	
-//	@Source("noise.png")
-//	@ImageOptions(repeatStyle=RepeatStyle.Both)
-//	ImageResource backgroundImage();
-//
-//	@Source("logo.png")
-//	@ImageOptions(repeatStyle=RepeatStyle.None)
-//	ImageResource logoImage();
-//
-//	@Source("delete-16.png")
-//	ImageResource delete16Image();
+	@Source("profile-background.jpg")
+	ImageResource profileBackgroundImage();
 
 }

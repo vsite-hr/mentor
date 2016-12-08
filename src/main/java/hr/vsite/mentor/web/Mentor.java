@@ -16,6 +16,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import hr.vsite.mentor.web.activities.MentorActivityMapper;
 import hr.vsite.mentor.web.theme.Theme;
 
+import gwt.material.design.client.ui.MaterialToast;
+
 public class Mentor implements EntryPoint {
 	
 	public static void setTitle(String placeSuffix) {
@@ -28,7 +30,7 @@ public class Mentor implements EntryPoint {
 		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 			public void onUncaughtException(Throwable e) {
 				Log.log(Level.SEVERE, e.getMessage(), e);
-				Window.alert("Unknown error, please reload application");
+				MaterialToast.fireToast("Unknown error, please reload application");
 			}
 		});
 

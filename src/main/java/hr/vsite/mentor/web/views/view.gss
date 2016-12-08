@@ -2,3 +2,44 @@
 
 .view {
 }
+
+@external side-nav;
+
+.side-nav li {
+	width: 100%;
+}
+
+.toc {
+	margin: 20px 0px 20px 10px;
+}
+
+@external pinned;
+
+.toc.pinned {
+	width: 15%;
+}
+
+.toc li {
+	margin-bottom: 20px;
+	width: 100%;
+}
+
+@external material-label;
+
+.toc .material-label {
+	display: inline-block;
+	font-weight: 300;
+	color: #757575;
+	padding-left: 20px;
+	height: 1.5rem;
+	line-height: 1.5rem;
+	letter-spacing: .4;
+}
+
+@external material-icons;
+
+.toc .material-icons {
+	margin-left: 20px;
+	color: #757575;
+	cursor: default !important;
+}

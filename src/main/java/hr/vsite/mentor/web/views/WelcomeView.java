@@ -76,6 +76,8 @@ public class WelcomeView extends Composite {
 
 		ApplicationShell.get().showProgress(ProgressType.INDETERMINATE);
 
+		// TODO add loader and cancel it if still running
+
 		Api.get().course().list(null, null, 100, 0, new MethodCallback<List<Course>>() {
 			@Override
 			public void onSuccess(Method method, List<Course> courses) {

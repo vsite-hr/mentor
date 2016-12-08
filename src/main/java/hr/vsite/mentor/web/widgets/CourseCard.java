@@ -74,7 +74,7 @@ public class CourseCard extends MaterialCard {
 		title.setText(course.getTitle());
 		title.setHref(courseHref);
 		description.setText(course.getDescription());
-		lecturesLink.setText("7 lectures");	// TODO
+		lecturesLink.setText("7 lekcija");	// TODO
 		lecturesLink.setHref(courseHref);
 		
 	}

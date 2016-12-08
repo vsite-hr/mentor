@@ -15,8 +15,10 @@ import gwt.material.design.client.ui.MaterialImage;
 import gwt.material.design.client.ui.MaterialLabel;
 import gwt.material.design.client.ui.MaterialLink;
 
+import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.web.Places;
+import hr.vsite.mentor.web.places.LecturePlace;
 
 public class LectureCard extends MaterialCard {
 
@@ -31,7 +33,7 @@ public class LectureCard extends MaterialCard {
 		String description();
 	}
 	
-	public LectureCard(Lecture lecture) {
+	public LectureCard(Course course, Lecture lecture) {
 	
 		setBackgroundColor(Color.WHITE);
 		setHoverable(true);
@@ -59,21 +61,25 @@ public class LectureCard extends MaterialCard {
 		
 		//image.addClickHandler(e -> Places.controller().goTo(new LecturePlace(this.lecture.getId())));	// TODO
 		
-		setLecture(lecture);
+		setLecture(course, lecture);
 
 	}
 
-	public void setLecture(Lecture lecture) {
+	public Course getCourse() { return course; }
+	public Lecture getLecture() { return lecture; }
 
+	public void setLecture(Course course, Lecture lecture) {
+
+		this.course = course;
 		this.lecture = lecture;
 		
-		String lectureHref = "#"/* + Places.mapper().getToken(new LecturePlace(lecture.getId()))*/;	// TODO
+		String lectureHref = "#" + Places.mapper().getToken(new LecturePlace(course.getId(), lecture.getId()));
 		
 		image.setUrl("https://www.vsite.hr/sites/default/files/promocija2015_027.JPG");	// TODO
 		title.setText(lecture.getTitle());
 		title.setHref(lectureHref);
 		description.setText(lecture.getDescription());
-		unitsLink.setText("13 units");	// TODO
+		unitsLink.setText("13 poglavlja");	// TODO
 		unitsLink.setHref(lectureHref);
 		
 	}
@@ -82,11 +88,12 @@ public class LectureCard extends MaterialCard {
 	private final MaterialLink title;
 	private final MaterialLabel description;
 	private final MaterialLink unitsLink;
+	private Course course = null;
 	private Lecture lecture = null;
 	
 	private static final Resources res = GWT.create(Resources.class);
 	static {
 		res.style().ensureInjected();
 	}
-
+	
 }
