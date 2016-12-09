@@ -5,7 +5,7 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 
 import hr.vsite.mentor.web.places.MentorPlaceHistoryMapper;
-import hr.vsite.mentor.web.places.WelcomePlace;
+import hr.vsite.mentor.web.places.ClassroomPlace;
 
 public class Places {
 
@@ -14,7 +14,7 @@ public class Places {
 	public static PlaceHistoryHandler handler() { return historyHandler; }
 
 	public static void goHome() {
-		placeController.goTo(new WelcomePlace());
+		placeController.goTo(new ClassroomPlace());
 	}
 	
 	private static final PlaceController placeController;
@@ -28,7 +28,7 @@ public class Places {
 		historyMapper = GWT.create(MentorPlaceHistoryMapper.class);
         
 		historyHandler = new PlaceHistoryHandler(historyMapper);
-		historyHandler.register(placeController, MentorBus.get(), new WelcomePlace());
+		historyHandler.register(placeController, MentorBus.get(), new ClassroomPlace());
 
 	}
 	

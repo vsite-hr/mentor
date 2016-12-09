@@ -13,27 +13,29 @@ import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialRow;
 import gwt.material.design.client.ui.html.Heading;
 
-public class ElearningBanner extends MaterialPanel {
+public class ClassroomBanner extends MaterialPanel {
 
 	public interface Resources extends ClientBundle {
-		@Source("ElearningBanner.gss")
+		@Source("ClassroomBanner.gss")
 		public Style style();
-		@Source("elearning.jpg")
+		@Source("classroom.jpg")
 		public ImageResource elearning();
 	}
 
-	@CssResource.ImportedWithPrefix("ElearningBanner")
+	@CssResource.ImportedWithPrefix("ClassroomBanner")
 	public interface Style extends CssResource {
 		String view();
 		String title();
 		String image();
 	}
 
-	public ElearningBanner() {
+	public ClassroomBanner() {
+
+		setBackgroundColor(Color.WHITE);
+		addStyleName(res.style().view());
+		setShadow(1);
 
 		MaterialRow row = new MaterialRow();
-		row.addStyleName(res.style().view());
-		row.setShadow(1);
 			MaterialColumn textColumn = new MaterialColumn();
 			textColumn.setGrid("s12 m6");
 				Heading title = new Heading(HeadingSize.H1);

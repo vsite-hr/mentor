@@ -22,7 +22,7 @@ public class CourseActivity extends AbstractActivity {
 			return;
 		}
 		
-		CourseView.get().init(place.getCourseId());
+		CourseView.get().init(place);
 		CourseView.get().show(containerWidget);
 		
 	}

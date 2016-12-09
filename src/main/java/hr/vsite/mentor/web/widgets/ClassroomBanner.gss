@@ -7,6 +7,11 @@
 	overflow-wrap: break-word;
 	margin: 20px;
 }
+@media only screen and (min-width: 601px) {
+	.title {
+		margin-top: 60px;
+	}
+}
 
 .image {
 	width: 100%;

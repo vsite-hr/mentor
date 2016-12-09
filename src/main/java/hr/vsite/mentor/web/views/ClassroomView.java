@@ -9,9 +9,10 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Composite;
 
 import hr.vsite.mentor.course.Course;
+import hr.vsite.mentor.web.places.ClassroomPlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.CourseCard;
-import hr.vsite.mentor.web.widgets.ElearningBanner;
+import hr.vsite.mentor.web.widgets.ClassroomBanner;
 
 import gwt.material.design.client.constants.ProgressType;
 import gwt.material.design.client.ui.MaterialColumn;
@@ -21,11 +22,11 @@ import gwt.material.design.client.ui.MaterialToast;
 import gwt.material.design.client.ui.animate.MaterialAnimation;
 import gwt.material.design.client.ui.animate.Transition;
 
-public class WelcomeView extends Composite {
+public class ClassroomView extends Composite {
 
-	public static WelcomeView get() {
+	public static ClassroomView get() {
 		if (instance == null)
-			instance = new WelcomeView();
+			instance = new ClassroomView();
 		return instance;
 	}
 	
@@ -40,7 +41,7 @@ public class WelcomeView extends Composite {
 //		String news();
 //	}
 	
-	private WelcomeView() {
+	private ClassroomView() {
 		
 		super();
 
@@ -49,7 +50,7 @@ public class WelcomeView extends Composite {
 				MaterialColumn bannerColumn = new MaterialColumn();
 				bannerColumn.setGrid("s12 m12 l8");
 				bannerColumn.setOffset("l2");
-					ElearningBanner elearningCard = new ElearningBanner();
+					ClassroomBanner elearningCard = new ClassroomBanner();
 				bannerColumn.add(elearningCard);
 			bannerRow.add(bannerColumn);
 		view.add(bannerRow);
@@ -70,7 +71,7 @@ public class WelcomeView extends Composite {
 		containerWidget.setWidget(ApplicationShell.get().wrap(this));
 	}
 
-	public void init() {
+	public void init(ClassroomPlace place) {
 
 		coursesContainerRow.clear();
 
@@ -108,7 +109,7 @@ public class WelcomeView extends Composite {
 
 	private final MaterialRow coursesContainerRow;
 	
-	private static WelcomeView instance = null;
+	private static ClassroomView instance = null;
 	
 //	private static final Resources res = GWT.create(Resources.class);
 //	static {

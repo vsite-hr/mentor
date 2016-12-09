@@ -1,7 +1,6 @@
 package hr.vsite.mentor.web.views;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -13,6 +12,7 @@ import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.web.Loader;
 import hr.vsite.mentor.web.Places;
+import hr.vsite.mentor.web.places.CoursePlace;
 import hr.vsite.mentor.web.places.LecturePlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.CourseBanner;
@@ -85,7 +85,7 @@ public class CourseView extends MaterialPanel {
 		containerWidget.setWidget(ApplicationShell.get().wrap(this));
 	}
 
-	public void init(UUID courseId) {
+	public void init(CoursePlace place) {
 
 		courseBanner.setVisible(false);
 		lecturesContainer.clear();
@@ -96,7 +96,7 @@ public class CourseView extends MaterialPanel {
 		Loader<LoadComponent> loader = Loader.start(LoadComponent.class)
 			.setCancelOnError(true)
 			.setProgress(ApplicationShell.get(), ProgressType.INDETERMINATE);
-		loader.add(LoadComponent.Course, Api.get().course().findById(courseId, new MethodCallback<Course>() {
+		loader.add(LoadComponent.Course, Api.get().course().findById(place.getCourseId(), new MethodCallback<Course>() {
 			@Override
 			public void onSuccess(Method method, Course course) {
 				CourseView.this.course = course;
@@ -115,7 +115,7 @@ public class CourseView extends MaterialPanel {
 				MaterialToast.fireToast("Couldn't load course! " + exception);
 			}
 		}));
-		loader.add(LoadComponent.Lectures, Api.get().lecture().list(null, null, courseId, 100, 0, new MethodCallback<List<Lecture>>() {
+		loader.add(LoadComponent.Lectures, Api.get().lecture().list(null, null, place.getCourseId(), 100, 0, new MethodCallback<List<Lecture>>() {
 			@Override
 			public void onSuccess(Method method, List<Lecture> lectures) {
 				CourseView.this.lectures = lectures;

@@ -16,6 +16,7 @@ import hr.vsite.mentor.web.Places;
 
 import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.web.MentorBus;
+import hr.vsite.mentor.web.places.ClassroomPlace;
 import hr.vsite.mentor.web.places.CoursePlace;
 import hr.vsite.mentor.web.places.LecturePlace;
 import hr.vsite.mentor.web.services.Api;
@@ -76,7 +77,7 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 				MaterialNavSection navSection = new MaterialNavSection();
 				navSection.setFloat(Float.RIGHT);
 					MaterialTooltip frontpageTooltip = new MaterialTooltip();
-						MaterialLink frontpageLink = new MaterialLink("Učionica", "");
+						MaterialLink frontpageLink = new MaterialLink("Učionica", Places.mapper().getToken(new ClassroomPlace()));
 						frontpageLink.setWaves(WavesType.LIGHT);
 						frontpageLink.setTextColor(Color.WHITE);
 					frontpageTooltip.add(frontpageLink);
@@ -106,9 +107,9 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 				profile.setResource(Theme.bundle().profileBackgroundImage());
 				profile.setHeight("180px");
 			sideNav.add(profile);
-				MaterialLink sideNavIndexLink = new MaterialLink("Učionica", "");
-				sideNavIndexLink.setWaves(WavesType.DEFAULT);
-			sideNav.add(sideNavIndexLink);
+				MaterialLink sideNavClassroomLink = new MaterialLink("Učionica", Places.mapper().getToken(new ClassroomPlace()));
+				sideNavClassroomLink.setWaves(WavesType.DEFAULT);
+			sideNav.add(sideNavClassroomLink);
 				sideNavCourseLink = new MaterialLink();
 				sideNavCourseLink.addStyleName(res.style().sideNavCourse());
 				sideNavCourseLink.setVisible(false);

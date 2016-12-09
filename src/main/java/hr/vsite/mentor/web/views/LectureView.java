@@ -1,7 +1,6 @@
 package hr.vsite.mentor.web.views;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -15,6 +14,7 @@ import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.web.Loader;
 import hr.vsite.mentor.web.Places;
 import hr.vsite.mentor.web.places.CoursePlace;
+import hr.vsite.mentor.web.places.LecturePlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.LectureBanner;
 import hr.vsite.mentor.web.widgets.UnitWidget;
@@ -88,7 +88,7 @@ public class LectureView extends MaterialPanel {
 		containerWidget.setWidget(ApplicationShell.get().wrap(this));
 	}
 
-	public void init(UUID courseId, UUID lectureId) {
+	public void init(LecturePlace place) {
 
 		lectureBanner.setVisible(false);
 		unitsContainer.clear();
@@ -99,7 +99,7 @@ public class LectureView extends MaterialPanel {
 		Loader<LoadComponent> loader = Loader.start(LoadComponent.class)
 			.setCancelOnError(true)
 			.setProgress(ApplicationShell.get(), ProgressType.INDETERMINATE);
-		loader.add(LoadComponent.Course, Api.get().course().findById(courseId, new MethodCallback<Course>() {
+		loader.add(LoadComponent.Course, Api.get().course().findById(place.getCourseId(), new MethodCallback<Course>() {
 			@Override
 			public void onSuccess(Method method, Course course) {
 				LectureView.this.course = course;
@@ -116,7 +116,7 @@ public class LectureView extends MaterialPanel {
 				MaterialToast.fireToast("Couldn't load course! " + exception);
 			}
 		}));
-		loader.add(LoadComponent.Lecture, Api.get().lecture().findById(lectureId, new MethodCallback<Lecture>() {
+		loader.add(LoadComponent.Lecture, Api.get().lecture().findById(place.getLectureId(), new MethodCallback<Lecture>() {
 			@Override
 			public void onSuccess(Method method, Lecture lecture) {
 				LectureView.this.lecture = lecture;
@@ -135,7 +135,7 @@ public class LectureView extends MaterialPanel {
 				MaterialToast.fireToast("Couldn't load lecture! " + exception);
 			}
 		}));
-		loader.add(LoadComponent.Units, Api.get().unit().list(null, null, null, lectureId, 100, 0, new MethodCallback<List<Unit>>() {
+		loader.add(LoadComponent.Units, Api.get().unit().list(null, null, null, place.getLectureId(), 100, 0, new MethodCallback<List<Unit>>() {
 			@Override
 			public void onSuccess(Method method, List<Unit> units) {
 				LectureView.this.units = units;
