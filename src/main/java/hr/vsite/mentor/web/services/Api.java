@@ -15,6 +15,14 @@ public class Api {
 	
 	private Api() {}
 
+	public UserService user() {
+		if (userService == null) {
+			userService = GWT.create(UserService.class);
+			((RestServiceProxy) userService).setResource(getResource("users"));
+		}
+		return userService;
+	}
+	
 	public CourseService course() {
 		if (courseService == null) {
 			courseService = GWT.create(CourseService.class);
@@ -45,6 +53,7 @@ public class Api {
 	
 	private static Api instance = null;
 	
+	private UserService userService = null;
 	private CourseService courseService = null;
 	private LectureService lectureService = null;
 	private UnitService unitService = null;
