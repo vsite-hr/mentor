@@ -111,13 +111,13 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 				MaterialLink sideNavClassroomLink = new MaterialLink("Kolegiji", Places.mapper().getToken(new ClassroomPlace()));
 				sideNavClassroomLink.setWaves(WavesType.DEFAULT);
 			sideNav.add(sideNavClassroomLink);
-				MaterialLink sideNavLecturersLink = new MaterialLink("Predavači", Places.mapper().getToken(new LecturersPlace()));
-				sideNavLecturersLink.setWaves(WavesType.DEFAULT);
-			sideNav.add(sideNavLecturersLink);
 				sideNavCourseLink = new MaterialLink();
 				sideNavCourseLink.addStyleName(res.style().sideNavCourse());
 				sideNavCourseLink.setVisible(false);
 			sideNav.add(sideNavCourseLink);
+				MaterialLink sideNavLecturersLink = new MaterialLink("Predavači", Places.mapper().getToken(new LecturersPlace()));
+				sideNavLecturersLink.setWaves(WavesType.DEFAULT);
+			sideNav.add(sideNavLecturersLink);
 		header.add(sideNav);
 		add(header);
 
@@ -190,7 +190,7 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 						return;
 					}
 					sideNavCourseLink.setText(course.getTitle());
-					sideNavCourseLink.setHref(Places.mapper().getToken(new CoursePlace(course.getId())));
+					sideNavCourseLink.setHref("#" + Places.mapper().getToken(new CoursePlace(course.getId())));
 					sideNavCourseLink.setVisible(true);
 				}
 				@Override
