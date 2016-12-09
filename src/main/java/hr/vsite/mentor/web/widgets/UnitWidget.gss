@@ -1,8 +1,10 @@
 .view {
+    margin: 3rem 0;
 }
 
 .titlePanel {
 	padding: 5px 0.75rem;
+	border-bottom: solid 1px #ccc;
 }
 
 .title {
@@ -11,12 +13,13 @@
 .badge {
 	float: right;
 	position: static !important;
-	margin-top: 0.6rem;
+	margin-top: 1.5rem;
 	font-size: 1.5rem !important;
 	padding: 15px !important;
-	color: #ddd !important;;
+	color: #ddd !important;
 }
 
 .content {
 	padding: 10px;
+	line-height: 1.8;
 }

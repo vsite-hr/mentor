@@ -33,10 +33,12 @@ import gwt.material.design.client.ui.MaterialHeader;
 import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialNavBar;
 import gwt.material.design.client.ui.MaterialNavBrand;
+import gwt.material.design.client.ui.MaterialNavSection;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialSearch;
 import gwt.material.design.client.ui.MaterialSideNav;
 import gwt.material.design.client.ui.MaterialToast;
+import gwt.material.design.client.ui.MaterialTooltip;
 
 public class ApplicationShell extends MaterialPanel implements HasProgress {
 
@@ -57,6 +59,7 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 	public interface Style extends CssResource {
 	    String DefaultCss = "hr/vsite/mentor/web/views/view.gss";
 		String view();
+		String sideNavCourse();
 		String toc();
 	}
 
@@ -70,9 +73,22 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 				navBrand.setPaddingRight(20.0);
 				navBrand.setHref(GWT.getHostPageBaseURL());
 			mainNavBar.add(navBrand);
-				MaterialLink searchLink = new MaterialLink(IconType.SEARCH);
-				searchLink.setFloat(Float.RIGHT);
-			mainNavBar.add(searchLink);
+				MaterialNavSection navSection = new MaterialNavSection();
+				navSection.setFloat(Float.RIGHT);
+					MaterialTooltip frontpageTooltip = new MaterialTooltip();
+						MaterialLink frontpageLink = new MaterialLink("Učionica", "");
+						frontpageLink.setWaves(WavesType.LIGHT);
+						frontpageLink.setTextColor(Color.WHITE);
+					frontpageTooltip.add(frontpageLink);
+					frontpageTooltip.setText("Pregled dostupnih kolegija");
+				navSection.add(frontpageTooltip);
+					MaterialTooltip searchTooltip = new MaterialTooltip();
+						MaterialLink searchLink = new MaterialLink(IconType.SEARCH);
+						searchLink.setWaves(WavesType.LIGHT);
+					searchTooltip.add(searchLink);
+					searchTooltip.setText("Pretraži gradivo");
+				navSection.add(searchTooltip);
+			mainNavBar.add(navSection);
 		header.add(mainNavBar);
 			MaterialNavBar searchNavBar = new MaterialNavBar();
 			searchNavBar.setVisible(false);
@@ -93,12 +109,14 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 				MaterialLink sideNavIndexLink = new MaterialLink("Učionica", "");
 				sideNavIndexLink.setWaves(WavesType.DEFAULT);
 			sideNav.add(sideNavIndexLink);
-				sideNavCourseLink= new MaterialLink();
+				sideNavCourseLink = new MaterialLink();
+				sideNavCourseLink.addStyleName(res.style().sideNavCourse());
 				sideNavCourseLink.setVisible(false);
 			sideNav.add(sideNavCourseLink);
 		header.add(sideNav);
 		add(header);
 
+		
 		workPanel = new MaterialContainer();
 		add(workPanel);
 		

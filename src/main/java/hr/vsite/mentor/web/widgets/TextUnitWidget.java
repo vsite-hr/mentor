@@ -27,7 +27,7 @@ public class TextUnitWidget extends UnitWidget {
 		MaterialColumn textColumn = new MaterialColumn();
 		textColumn.setGrid("s12");
 			html = new HTML();
-			html.addStyleName("flow-text");
+			//html.addStyleName("flow-text");
 		textColumn.add(html);
 		getContentRow().add(textColumn);
 	

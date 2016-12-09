@@ -8,7 +8,6 @@ import hr.vsite.mentor.unit.TextUnit;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.VideoUnit;
 
-import gwt.material.design.client.constants.Color;
 import gwt.material.design.client.constants.HeadingSize;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialRow;
@@ -46,17 +45,12 @@ public abstract class UnitWidget extends MaterialPanel {
 	
 	protected UnitWidget() {
 
-		setBackgroundColor(Color.WHITE);
-		setShadow(1);
-		setHoverable(true);
 		addStyleName(res.style().view());
 		
 		titlePanel = new MaterialPanel();
-		titlePanel.setBackgroundColor(Color.RED_LIGHTEN_2);
 		titlePanel.addStyleName(res.style().titlePanel());
-			title = new Heading(HeadingSize.H5);
+			title = new Heading(HeadingSize.H4);
 			title.addStyleName(res.style().title());
-			title.setTextColor(Color.GREY_LIGHTEN_3);
 		titlePanel.add(title);
 		add(titlePanel);
 		

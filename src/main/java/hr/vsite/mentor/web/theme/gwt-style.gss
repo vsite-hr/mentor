@@ -11,97 +11,10 @@
 
 body {
 	background-color: whitesmoke;
+	color: #333;
+	font-size: medium;
 }
 
-/* a, a:VISITED { */
-/* 	text-decoration: none; */
-/* 	color: #4865D3; */
-/* } */
-
-/* a:HOVER { */
-/* 	text-decoration: underline; */
-/* 	color: #4865D3; */
-/* 	cursor: pointer; */
-/* } */
-
-
-/* ::-webkit-input-placeholder { */
-/*     color: #ccc; */
-/*     font-style: italic; */
-/* } */
-/* :-moz-placeholder { */
-/*     color: #ccc; */
-/*     font-style: italic; */
-/* } */
-/* ::-moz-placeholder { */
-/*     color: #ccc; */
-/*     font-style: italic; */
-/* } */
-/* :-ms-input-placeholder { */
-/*     color: #ccc; */
-/*     font-style: italic; */
-/* } */
-
-/* .gwt-Button { */
-/*  	background-image: url("images/hborder.png"); */
-/* 	background-position: 0px -2077px; */
-/* 	background-color: transparent;	 */
-/* 	border-color: #f0583d; */
-/* 	color: white; */
-/* } */
-
-/* .gwt-Button:HOVER { */
-/* 	border-color: #ff2121; */
-/* } */
-
-/* .gwt-SuggestBox { */
-/* 	font-size: small;	make same as for .gwt-TextBox */
-/* } */
-
-/* .gwt-TextBox, .gwt-SuggestBox, .gwt-DateBox { */
-/* 	padding: 5px 4px; */
-/* 	border: 1px solid #ccc; */
-/* 	border-top: 1px solid #999; */
-/* 	border-left: 1px solid #999; */
-/* } */
-
-/* .gwt-MenuBar .gwt-MenuItem, .gwt-TextBox, .gwt-SuggestBox, .gwt-TextArea { */
-/*     font-family: "Ubuntu, Verdana,Tahoma,sans-serif"; */
-/* 	color: #303C44; */
-/* } */
-
-/* .gwt-MenuBar-vertical .gwt-MenuItem { */
-/*     padding: 10px 40px 10px 5px; */
-/* } */
-
-/* .gwt-SplitLayoutPanel .gwt-SplitLayoutPanel-HDragger, .gwt-SplitLayoutPanel .gwt-SplitLayoutPanel-VDragger { */
-/* 	background-color: transparent; */
-/* } */
-
-/* .gwt-RadioButton { */
-/* 	white-space: nowrap; */
-/* } */
-
-/* .gwt-TextArea { */
-/* 	resize: none; */
-/* 	-webkit-box-sizing: border-box; */
-/* 	-moz-box-sizing: border-box; */
-/* 	box-sizing: border-box; */
-/* 	margin: 0; */
-/* } */
-
-/* .gwt-DialogBox .Caption { */
-/* 	font-family: "Arial Unicode MS,Arial,sans-serif"; */
-/*     padding: 10px; */
-/* } */
-
-/* .imageButton { */
-/* 	filter: grayscale(100%) brightness(150%); */
-/* 	-webkit-filter: grayscale(100%) brightness(150%); */
-/* 	cursor: pointer; */
-/* } */
-
-/* .imageButton-up-hovering { */
-/* 	filter: none; */
-/* 	-webkit-filter: none; */
-/* } */
+nav ul a {
+	font-size: x-large;
+}

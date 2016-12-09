@@ -9,6 +9,10 @@
 	width: 100%;
 }
 
+.sideNavCourse {
+	padding-left: 2rem !important;
+}
+
 .toc {
 	margin: 20px 0px 20px 10px;
 }
