@@ -18,13 +18,15 @@ import hr.vsite.mentor.web.places.LecturePlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.CourseBanner;
 import hr.vsite.mentor.web.widgets.LectureWidget;
+import hr.vsite.mentor.web.widgets.TocTitle;
 
+import gwt.material.design.client.base.HasTextAlign;
 import gwt.material.design.client.constants.HideOn;
 import gwt.material.design.client.constants.IconType;
 import gwt.material.design.client.constants.ProgressType;
+import gwt.material.design.client.constants.TextAlign;
 import gwt.material.design.client.ui.MaterialColumn;
 import gwt.material.design.client.ui.MaterialIcon;
-import gwt.material.design.client.ui.MaterialLabel;
 import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialPushpin;
@@ -145,10 +147,11 @@ public class CourseView extends MaterialPanel {
 			}
 		}));
 		loader.setLoadedHandler(() -> {
-			toc.add(new MaterialLink("Učionica", ""));
-			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
-			toc.add(new MaterialLabel(course.getTitle()));
-			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
+			toc.add(new TocTitle(course.getTitle(), course.getDescription()));
+			MaterialIcon courseIcon = new MaterialIcon(IconType.ARROW_DOWNWARD);
+			toc.add(courseIcon);
+			if (courseIcon.getParent() instanceof HasTextAlign)
+				((HasTextAlign) courseIcon.getParent()).setTextAlign(TextAlign.CENTER);	// dirty, but works
 			for (Lecture lecture : lectures) {
 				MaterialLink tocLink = new MaterialLink(lecture.getTitle(), Places.mapper().getToken(new LecturePlace(course.getId(), lecture.getId())));
 				//tocLink.setHref("#" + lecture.getId());	// TODO TOC/Scrollspy does not work

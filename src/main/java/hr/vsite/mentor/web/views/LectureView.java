@@ -18,14 +18,16 @@ import hr.vsite.mentor.web.places.CoursePlace;
 import hr.vsite.mentor.web.places.LecturePlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.widgets.LectureBanner;
+import hr.vsite.mentor.web.widgets.TocTitle;
 import hr.vsite.mentor.web.widgets.UnitWidget;
 
+import gwt.material.design.client.base.HasTextAlign;
 import gwt.material.design.client.constants.HideOn;
 import gwt.material.design.client.constants.IconType;
 import gwt.material.design.client.constants.ProgressType;
+import gwt.material.design.client.constants.TextAlign;
 import gwt.material.design.client.ui.MaterialColumn;
 import gwt.material.design.client.ui.MaterialIcon;
-import gwt.material.design.client.ui.MaterialLabel;
 import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialPushpin;
@@ -164,12 +166,16 @@ public class LectureView extends MaterialPanel {
 			}
 		}));
 		loader.setLoadedHandler(() -> {
-			toc.add(new MaterialLink("Učionica", ""));
-			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
-			toc.add(new MaterialLink(course.getTitle(), Places.mapper().getToken(new CoursePlace(course.getId()))));
-			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
-			toc.add(new MaterialLabel(lecture.getTitle()));
-			toc.add(new MaterialIcon(IconType.ARROW_DOWNWARD));
+			toc.add(new TocTitle(course.getTitle(), course.getDescription(), Places.mapper().getToken(new CoursePlace(course.getId()))));
+			MaterialIcon courseIcon = new MaterialIcon(IconType.ARROW_DOWNWARD);
+			toc.add(courseIcon);
+			if (courseIcon.getParent() instanceof HasTextAlign)
+				((HasTextAlign) courseIcon.getParent()).setTextAlign(TextAlign.CENTER);	// dirty, but works
+			toc.add(new TocTitle(lecture.getTitle(), lecture.getDescription()));
+			MaterialIcon lectureIcon = new MaterialIcon(IconType.ARROW_DOWNWARD);
+			toc.add(lectureIcon);
+			if (lectureIcon.getParent() instanceof HasTextAlign)
+				((HasTextAlign) lectureIcon.getParent()).setTextAlign(TextAlign.CENTER);	// dirty, but works
 			for (Unit unit : units) {
 				MaterialLink tocLink = new MaterialLink(unit.getTitle()/*, Places.mapper().getToken(new LecturePlace(course.getId(), lecture.getId()))*/);
 				//tocLink.setHref("#" + unit.getId());	// TODO TOC/Scrollspy does not work

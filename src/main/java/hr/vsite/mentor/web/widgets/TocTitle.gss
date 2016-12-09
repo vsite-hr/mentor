@@ -1,0 +1,18 @@
+.view {
+	padding: 1rem;
+}
+
+.link {
+	padding-left: 0 !important;
+}
+
+.view > .link:hover {
+	border-left-width: 0 !important;
+}
+
+.title {
+	display: inline;
+}
+
+.description {
+}

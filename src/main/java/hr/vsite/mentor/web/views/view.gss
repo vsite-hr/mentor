@@ -43,7 +43,6 @@
 @external material-icons;
 
 .toc .material-icons {
-	margin-left: 20px;
 	color: #757575;
 	cursor: default !important;
 }

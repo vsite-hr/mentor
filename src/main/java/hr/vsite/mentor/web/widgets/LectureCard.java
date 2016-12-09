@@ -59,7 +59,7 @@ public class LectureCard extends MaterialCard {
 		cardAction.add(unitsLink);
 		add(cardAction);
 		
-		//image.addClickHandler(e -> Places.controller().goTo(new LecturePlace(this.lecture.getId())));	// TODO
+		image.addClickHandler(e -> LectureCard.this.onImageClick());
 		
 		setLecture(course, lecture);
 
@@ -82,6 +82,10 @@ public class LectureCard extends MaterialCard {
 		unitsLink.setText("13 poglavlja");	// TODO
 		unitsLink.setHref(lectureHref);
 		
+	}
+
+	private void onImageClick() {
+		Places.controller().goTo(new LecturePlace(course.getId(), lecture.getId()));
 	}
 
 	private final MaterialImage image;
