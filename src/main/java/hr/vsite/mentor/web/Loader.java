@@ -1,7 +1,5 @@
 package hr.vsite.mentor.web;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,30 +17,6 @@ public class Loader<E extends Enum<E>> {
 		void onLoaded();
 	}
 
-	public static <E extends Enum<E>> Loader<E> start(Class<E> clazz) {
-		return start(clazz.getEnumConstants());
-	}
-
-	@SafeVarargs
-	public static <E extends Enum<E>> Loader<E> start(E... components) {
-		return start(Arrays.asList(components));
-	}
-
-	public static <E extends Enum<E>> Loader<E> start(Collection<E> components) {
-		return new Loader<E>(components);
-	}
-
-	private Loader(Collection<E> components) {
-		requests = new HashMap<>();
-		for (E component : components)
-			requests.put(component, null);
-		pending = new HashSet<>(components);
-		successes = new HashSet<>();
-		errors = new HashSet<>();
-		finished = new HashSet<>();
-		cancelled = new HashSet<>();
-	}
-	
 	public Set<E> getPending() { return pending; }
 	public Set<E> getSuccesses() { return successes; }
 	public Set<E> getErrors() { return errors; }
@@ -64,11 +38,10 @@ public class Loader<E extends Enum<E>> {
 	}
 
 	public Loader<E> add(E component, Request request) {
-		if (!requests.containsKey(component))
-			throw new IllegalArgumentException("Unknown loading component: " + component.toString());
-		if (requests.get(component) != null)
+		if (requests.containsKey(component))
 			throw new IllegalStateException("Loading component " + component.toString() + " initialized more then once");
 		requests.put(component, request);
+		pending.add(component);
 		return this;
 	}
 	
@@ -79,8 +52,6 @@ public class Loader<E extends Enum<E>> {
 	public Loader<E> success(E component) {
 		if (!requests.containsKey(component))
 			throw new IllegalArgumentException("Unknown loading component: " + component.toString());
-		if (requests.get(component) == null)
-			throw new IllegalStateException("Loading component " + component.toString() + " not initialized");
 		successes.add(component);
 		finishAndCheckDone(component);
 		return this;
@@ -89,8 +60,6 @@ public class Loader<E extends Enum<E>> {
 	public Loader<E> error(E component) {
 		if (!requests.containsKey(component))
 			throw new IllegalArgumentException("Unknown loading component: " + component.toString());
-		if (requests.get(component) == null)
-			throw new IllegalStateException("Loading component " + component.toString() + " not initialized");
 		errors.add(component);
 		if (cancelOnError && pending.size() > 1)
 			for (E pendingComponent : pending)
@@ -116,12 +85,12 @@ public class Loader<E extends Enum<E>> {
 		return true;
 	}
 	
-	private final Map<E, Request> requests;
-	private final Set<E> pending;
-	private final Set<E> successes;
-	private final Set<E> errors;
-	private final Set<E> finished;
-	private final Set<E> cancelled;
+	private final Map<E, Request> requests = new HashMap<>();
+	private final Set<E> pending = new HashSet<>();
+	private final Set<E> successes = new HashSet<>();
+	private final Set<E> errors = new HashSet<>();
+	private final Set<E> finished = new HashSet<>();
+	private final Set<E> cancelled = new HashSet<>();
 	private boolean cancelOnError = false;
 	private HasProgress progress = null;
 	private ProgressType progressType = null;

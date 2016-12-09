@@ -28,7 +28,6 @@ public class UserResource {
 	}
 	
 	@GET
-	@Path("list")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public List<User> list(

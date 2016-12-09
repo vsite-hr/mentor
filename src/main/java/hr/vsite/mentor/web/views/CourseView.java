@@ -1,6 +1,7 @@
 package hr.vsite.mentor.web.views;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -90,10 +91,13 @@ public class CourseView extends MaterialPanel {
 		courseBanner.setVisible(false);
 		lecturesContainer.clear();
 		toc.clear();
+		
+		course = null;
+		lectures = null;
 
 		// TODO cancel loader if still running
 
-		Loader<LoadComponent> loader = Loader.start(LoadComponent.class)
+		Loader<LoadComponent> loader = new Loader<LoadComponent>()
 			.setCancelOnError(true)
 			.setProgress(ApplicationShell.get(), ProgressType.INDETERMINATE);
 		loader.add(LoadComponent.Course, Api.get().course().findById(place.getCourseId(), new MethodCallback<Course>() {
@@ -102,7 +106,7 @@ public class CourseView extends MaterialPanel {
 				CourseView.this.course = course;
 				if (course == null) {
 					loader.error(LoadComponent.Course);
-					MaterialToast.fireToast("Couldn't load course!");
+					MaterialToast.fireToast("Nije moguće učitati kolegij!");
 					return;
 				}
 				courseBanner.setCourse(course);
@@ -112,7 +116,7 @@ public class CourseView extends MaterialPanel {
 			@Override
 			public void onFailure(Method method, Throwable exception) {
 				loader.error(LoadComponent.Course);
-				MaterialToast.fireToast("Couldn't load course! " + exception);
+				MaterialToast.fireToast("Nije moguće učitati kolegij! " + exception);
 			}
 		}));
 		loader.add(LoadComponent.Lectures, Api.get().lecture().list(null, null, place.getCourseId(), 100, 0, new MethodCallback<List<Lecture>>() {
@@ -121,7 +125,7 @@ public class CourseView extends MaterialPanel {
 				CourseView.this.lectures = lectures;
 				if (lectures == null) {
 					loader.error(LoadComponent.Lectures);
-					MaterialToast.fireToast("Couldn't load lectures!");
+					MaterialToast.fireToast("Nije moguće učitati lekcije!");
 					return;
 				}
 				for (Lecture lecture : lectures) {
@@ -137,7 +141,7 @@ public class CourseView extends MaterialPanel {
 			@Override
 			public void onFailure(Method method, Throwable exception) {
 				loader.error(LoadComponent.Lectures);
-				MaterialToast.fireToast("Couldn't load lectures! " + exception);
+				MaterialToast.fireToast("Nije moguće učitati lekcije! " + exception);
 			}
 		}));
 		loader.setLoadedHandler(() -> {
@@ -151,6 +155,7 @@ public class CourseView extends MaterialPanel {
 				toc.add(tocLink);
 			}
 		});
+
 	}
 
 	private final MaterialScrollspy toc;
@@ -162,6 +167,8 @@ public class CourseView extends MaterialPanel {
 	
 	private static CourseView instance = null;
 
+	@SuppressWarnings("unused")
+	private static final Logger Log = Logger.getLogger(CourseView.class.getName());
 //	private static final Resources res = GWT.create(Resources.class);
 //	static {
 //		res.style().ensureInjected();
