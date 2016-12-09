@@ -7,7 +7,6 @@ import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.CssResource;
 
@@ -30,7 +29,7 @@ import gwt.material.design.client.ui.animate.MaterialAnimation;
 import gwt.material.design.client.ui.animate.Transition;
 import gwt.material.design.client.ui.html.Heading;
 
-public class ClassroomView extends Composite {
+public class ClassroomView extends MaterialPanel {
 
 	private static enum LoadComponent {
 		Lecturer,
@@ -59,36 +58,35 @@ public class ClassroomView extends Composite {
 		
 		super();
 
-		MaterialPanel view = new MaterialPanel();
-			MaterialRow bannerRow = new MaterialRow();
-				MaterialColumn bannerColumn = new MaterialColumn();
-				bannerColumn.setGrid("s12 m12 l8");
-				bannerColumn.setOffset("l2");
-					ClassroomBanner elearningCard = new ClassroomBanner();
-				bannerColumn.add(elearningCard);
-			bannerRow.add(bannerColumn);
-		view.add(bannerRow);
-			filtersRow = new MaterialRow();
-				MaterialColumn filtersColumn = new MaterialColumn();
-				filtersColumn.setGrid("s12 m10");
-				filtersColumn.setOffset("s0 m1");
-					filtersPanel = new MaterialPanel();
-					filtersPanel.addStyleName(res.style().filtersPanel());
-				filtersColumn.add(filtersPanel);
-			filtersRow.add(filtersColumn);
-			filtersRow.setVisible(false);
-		view.add(filtersRow);
-			MaterialRow coursesRow = new MaterialRow();
-				MaterialColumn coursesColumn = new MaterialColumn();
-				coursesColumn.setGrid("s12 m10");
-				coursesColumn.setOffset("s0 m1");
-					coursesContainerRow = new MaterialRow();
-				coursesColumn.add(coursesContainerRow);
-			coursesRow.add(coursesColumn);
-		view.add(coursesRow);
+		MaterialRow bannerRow = new MaterialRow();
+			MaterialColumn bannerColumn = new MaterialColumn();
+			bannerColumn.setGrid("s12 m12 l8");
+			bannerColumn.setOffset("l2");
+				ClassroomBanner baner = new ClassroomBanner();
+			bannerColumn.add(baner);
+		bannerRow.add(bannerColumn);
+		add(bannerRow);
 		
-		initWidget(view);
-
+		filtersRow = new MaterialRow();
+			MaterialColumn filtersColumn = new MaterialColumn();
+			filtersColumn.setGrid("s12 m10");
+			filtersColumn.setOffset("s0 m1");
+				filtersPanel = new MaterialPanel();
+				filtersPanel.addStyleName(res.style().filtersPanel());
+			filtersColumn.add(filtersPanel);
+		filtersRow.add(filtersColumn);
+		filtersRow.setVisible(false);
+		add(filtersRow);
+		
+		MaterialRow coursesRow = new MaterialRow();
+			MaterialColumn coursesColumn = new MaterialColumn();
+			coursesColumn.setGrid("s12 m10");
+			coursesColumn.setOffset("s0 m1");
+				coursesContainerRow = new MaterialRow();
+			coursesColumn.add(coursesContainerRow);
+		coursesRow.add(coursesColumn);
+		add(coursesRow);
+		
 	}
 	
 	public void show(AcceptsOneWidget containerWidget) {

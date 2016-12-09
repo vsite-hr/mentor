@@ -41,12 +41,13 @@ public class TocTitle extends Div implements HasTitle {
 	
 	public TocTitle(String title, String description, String href) {
 
-		setBackgroundColor(Color.WHITE);
+		setBackgroundColor(Color.GREY_LIGHTEN_5);
 		setShadow(1);
 		addStyleName(res.style().view());
 		
 		link = new MaterialLink();
 		link.addStyleName(res.style().link());
+		link.setHref(href);
 			header = new Heading(HeadingSize.H4);
 			header.addStyleName(res.style().title());
 		link.add(header);

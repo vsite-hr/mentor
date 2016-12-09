@@ -74,6 +74,7 @@ public class ClassroomPlace extends Place {
 	
 	public Filter getFilter() { return filter; }
 	public ClassroomPlace setFilter(Filter filter) { this.filter = filter; return this; }
+	public Filter filter() { return filter = new Filter(); }
 
 	private Filter filter = null;
 	

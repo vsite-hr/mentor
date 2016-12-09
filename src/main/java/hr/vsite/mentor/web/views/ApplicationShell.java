@@ -19,6 +19,7 @@ import hr.vsite.mentor.web.MentorBus;
 import hr.vsite.mentor.web.places.ClassroomPlace;
 import hr.vsite.mentor.web.places.CoursePlace;
 import hr.vsite.mentor.web.places.LecturePlace;
+import hr.vsite.mentor.web.places.LecturersPlace;
 import hr.vsite.mentor.web.services.Api;
 import hr.vsite.mentor.web.theme.Theme;
 
@@ -39,7 +40,6 @@ import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialSearch;
 import gwt.material.design.client.ui.MaterialSideNav;
 import gwt.material.design.client.ui.MaterialToast;
-import gwt.material.design.client.ui.MaterialTooltip;
 
 public class ApplicationShell extends MaterialPanel implements HasProgress {
 
@@ -76,19 +76,20 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 			mainNavBar.add(navBrand);
 				MaterialNavSection navSection = new MaterialNavSection();
 				navSection.setFloat(Float.RIGHT);
-					MaterialTooltip frontpageTooltip = new MaterialTooltip();
-						MaterialLink frontpageLink = new MaterialLink("Učionica", Places.mapper().getToken(new ClassroomPlace()));
-						frontpageLink.setWaves(WavesType.LIGHT);
-						frontpageLink.setTextColor(Color.WHITE);
-					frontpageTooltip.add(frontpageLink);
-					frontpageTooltip.setText("Pregled dostupnih kolegija");
-				navSection.add(frontpageTooltip);
-					MaterialTooltip searchTooltip = new MaterialTooltip();
-						MaterialLink searchLink = new MaterialLink(IconType.SEARCH);
-						searchLink.setWaves(WavesType.LIGHT);
-					searchTooltip.add(searchLink);
-					searchTooltip.setText("Pretraži gradivo");
-				navSection.add(searchTooltip);
+					MaterialLink classroomLink = new MaterialLink("Kolegiji", Places.mapper().getToken(new ClassroomPlace()));
+					classroomLink.setWaves(WavesType.LIGHT);
+					classroomLink.setTextColor(Color.WHITE);
+					classroomLink.setTooltip("Pregled dostupnih kolegija");
+				navSection.add(classroomLink);
+					MaterialLink lecturersLink = new MaterialLink("Predavači", Places.mapper().getToken(new LecturersPlace()));
+					lecturersLink.setWaves(WavesType.LIGHT);
+					lecturersLink.setTextColor(Color.WHITE);
+					lecturersLink.setTooltip("Popis predavača");
+				navSection.add(lecturersLink);
+					MaterialLink searchLink = new MaterialLink(IconType.SEARCH);
+					searchLink.setWaves(WavesType.LIGHT);
+					searchLink.setTooltip("Pretraži gradivo");
+				navSection.add(searchLink);
 			mainNavBar.add(navSection);
 		header.add(mainNavBar);
 			MaterialNavBar searchNavBar = new MaterialNavBar();
@@ -107,9 +108,12 @@ public class ApplicationShell extends MaterialPanel implements HasProgress {
 				profile.setResource(Theme.bundle().profileBackgroundImage());
 				profile.setHeight("180px");
 			sideNav.add(profile);
-				MaterialLink sideNavClassroomLink = new MaterialLink("Učionica", Places.mapper().getToken(new ClassroomPlace()));
+				MaterialLink sideNavClassroomLink = new MaterialLink("Kolegiji", Places.mapper().getToken(new ClassroomPlace()));
 				sideNavClassroomLink.setWaves(WavesType.DEFAULT);
 			sideNav.add(sideNavClassroomLink);
+				MaterialLink sideNavLecturersLink = new MaterialLink("Predavači", Places.mapper().getToken(new LecturersPlace()));
+				sideNavLecturersLink.setWaves(WavesType.DEFAULT);
+			sideNav.add(sideNavLecturersLink);
 				sideNavCourseLink = new MaterialLink();
 				sideNavCourseLink.addStyleName(res.style().sideNavCourse());
 				sideNavCourseLink.setVisible(false);

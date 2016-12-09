@@ -166,7 +166,7 @@ public class LectureView extends MaterialPanel {
 			}
 		}));
 		loader.setLoadedHandler(() -> {
-			toc.add(new TocTitle(course.getTitle(), course.getDescription(), Places.mapper().getToken(new CoursePlace(course.getId()))));
+			toc.add(new TocTitle(course.getTitle(), course.getDescription(), "#" + Places.mapper().getToken(new CoursePlace(course.getId()))));
 			MaterialIcon courseIcon = new MaterialIcon(IconType.ARROW_DOWNWARD);
 			toc.add(courseIcon);
 			if (courseIcon.getParent() instanceof HasTextAlign)

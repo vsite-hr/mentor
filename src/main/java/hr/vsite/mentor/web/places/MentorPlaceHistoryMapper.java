@@ -5,6 +5,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 
 @WithTokenizers({
 	ClassroomPlace.Tokenizer.class,
+	LecturersPlace.Tokenizer.class,
 	CoursePlace.Tokenizer.class,
 	LecturePlace.Tokenizer.class
 })
