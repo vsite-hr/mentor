@@ -58,29 +58,29 @@ public class LectureResource {
 	@Path("{lectureId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Lecture findById(@PathParam("lectureId") Lecture lectureId) {
+	public Lecture findById(@PathParam("lectureId") Lecture lecture) {
 
-		if (lectureId == null)
-			throw new NoSuchElementException("Unable to resolve Lecture, please provide other lecture_id !!");
+		if (lecture == null)
+			throw new NotFoundException("Unable to resolve Lecture, please provide other ID !!");
 
-		return lectureId;
+		return lecture;
 
 	}
 	
 	@GET
-	@Path("{lectureId}/headUnit")
+	@Path("{lectureId}/head")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Unit getHeadUnit(@PathParam("lectureId") Lecture lecture){
+	public Response getHeadUnit(@PathParam("lectureId") Lecture lecture){
 		
 		if(lecture == null)
-			throw new NoSuchElementException("Unable to resolve lectureHeadUnit, please provide other lecture_id !!");
+			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
 		
 		Unit headUnit = lectureProvider.get().getHeadUnit(lecture.getId());
 		if(headUnit == null)
-			throw new NoSuchElementException("Lecture doesn't have headUnit");
+			return Response.status(204).build();
 		
-		return headUnit;
+		return Response.status(200).entity(headUnit).build();
 	}
 	
 	@GET
@@ -89,17 +89,16 @@ public class LectureResource {
 	public Response photo(@PathParam("lectureId") Lecture lecture){
 		
 		if(lecture == null)
-			throw new NoSuchElementException("Unable to resolve thumbnail, please provide other lecture_id !!");
+			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
 		
-		Unit headUnit = lectureProvider.get().getHeadUnit(lecture.getId());
-		
+		Unit headUnit = lectureProvider.get().getHeadUnit(lecture.getId());	
 		if(headUnit != null){
 			java.nio.file.Path path = headUnit.getThumbnailPath();
 			if (path != null && Files.exists(path))
 				return Response.ok(path.toFile(), "image/jpeg").build();
 		}
 		
-		return Response.ok(ClassLoader.getSystemResourceAsStream("lecture.jpg"), "image/jpeg").build();
+		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
 	}
 
 	@POST
@@ -118,7 +117,7 @@ public class LectureResource {
 	public Response update(@QueryParam("lecture") Lecture lectureBefore, Lecture lectureAfter){
 		
 		if(lectureBefore == null || lectureBefore.getId() != lectureAfter.getId())
-			throw new NoSuchElementException("Unable to update Lecture, please provide other lecture_id !!");
+			throw new NotFoundException("Unable to update Lecture, please provide other ID !!");
 
 		return Response.status(200).entity(lectureProvider.get().update(lectureBefore.getId(), lectureAfter)).build();
 	}
@@ -129,7 +128,7 @@ public class LectureResource {
 	public Response delete(@QueryParam("lecture") Lecture lecture){	
 		
 		if(lecture == null)
-			throw new NoSuchElementException("Unable to delete Lecture, please provide other lecture_id !!");
+			throw new NotFoundException("Unable to delete Lecture, please provide other ID !!");
 		
 		return Response.status(200).entity(lectureProvider.get().delete(lecture)).build();
 	}
