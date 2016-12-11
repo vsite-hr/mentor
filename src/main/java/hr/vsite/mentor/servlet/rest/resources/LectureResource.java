@@ -2,8 +2,6 @@ package hr.vsite.mentor.servlet.rest.resources;
 
 import java.nio.file.Files;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -26,13 +24,15 @@ import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.lecture.LectureFilter;
 import hr.vsite.mentor.lecture.LectureManager;
 import hr.vsite.mentor.unit.Unit;
+import hr.vsite.mentor.unit.UnitManager;
 import hr.vsite.mentor.user.User;
 
 @Path("lectures")
 public class LectureResource {
 	
 	@Inject
-	public LectureResource(Provider<LectureManager> lectureProvider) {
+	public LectureResource(Provider<LectureManager> lectureProvider, Provider<UnitManager> unitProvider) {
+		this.unitProvider = unitProvider;
 		this.lectureProvider = lectureProvider;
 	}
 	
@@ -84,6 +84,34 @@ public class LectureResource {
 	}
 	
 	@GET
+	@Path("units/{lectureId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response units(@PathParam("lectureId") Lecture lecture){
+		
+		if(lecture == null)
+			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
+		
+		List<Unit> units = unitProvider.get().list(lecture);
+		if(units == null)
+			return Response.status(204).build();
+		
+		return Response.status(200).entity(units).build();
+	}
+	
+	@GET
+	@Path("units/count/{lectureId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public int unitsCount(@PathParam("lectureId") Lecture lecture){
+		
+		if(lecture == null)
+			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
+		
+		return unitProvider.get().count(lecture);
+	}
+	
+	@GET
 	@Path("{lectureId}/thumbnail")
 	@Transactional
 	public Response photo(@PathParam("lectureId") Lecture lecture){
@@ -100,7 +128,7 @@ public class LectureResource {
 		
 		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
 	}
-
+	
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -135,4 +163,5 @@ public class LectureResource {
 
 
 	private final Provider<LectureManager> lectureProvider;
+	private final Provider<UnitManager> unitProvider;
 }
