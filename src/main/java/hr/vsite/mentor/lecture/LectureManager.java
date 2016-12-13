@@ -1,27 +1,18 @@
 package hr.vsite.mentor.lecture;
 
-import java.sql.Array;
-import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLDataException;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-
 //import gwt.material.design.jscore.client.api.Array;
 import hr.vsite.mentor.Mentor;
+import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.db.JdbcUtils;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.UnitManager;
@@ -108,21 +99,64 @@ public class LectureManager {
 	    return lectures;	
 	}
 	
+	/** Returns all lectures for given {@link Course} in proper order.*/
+	public List<Lecture> list(Course course){
+		
+		List<Lecture> lectures = new ArrayList<Lecture>();
+		
+		String query = "SELEC lectures.* FROM lectures "
+						+ "JOIN course_lectures ON (lectures.lecture_id = course_lectures.lecture_id) "
+						+ "WHERE course_lectures.course_id = ? "
+						+ "ORDER BY course_lectures.lecture_ordinal ASC";
+		
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, course.getId());
+			try(ResultSet resultSet = statement.executeQuery()){
+				while(resultSet.next())
+					lectures.add(lectureFromResultSet(resultSet));			
+			}
+		}
+		catch(SQLException e){
+			throw new RuntimeException("Unable to resolve lectures for this Course: " + course.getId(), e);
+		}
+		
+		return lectures;
+	}
+	
+	/** Returns lecture count for given {@link Course}.*/
+	public int count(Course course){
+		
+		String query = "SELECT COUNT(*) AS lecture_num FROM course_lectures where course_id = ?";
+		
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, course.getId());
+			try(ResultSet resultSet = statement.executeQuery()){
+				if (!resultSet.next())
+					throw new SQLException("There is no lectures assigned to this Course: " + course.getId());
+			
+				return resultSet.getInt("lecture_num");
+			}
+		}
+		catch(SQLException e){
+			throw new RuntimeException("Unable to resolve lectures for this Course: " + course.getId(), e);
+		}
+	}
+	
+	/** Returns lecture_head_unit for given {@link Course}.*/
 	public Unit getHeadUnit(UUID lectureId){
 		
 		Unit headUnit = null;
-		String query = "SELECT * FROM units u WHERE EXISTS (SELECT 1 FROM lectures l WHERE u.unit_id = l.lecture_head_unit_id AND l.lecture_id = ?)";
+		
+		String query = "SELECT u.* FROM units u JOIN lectures l ON (u.unit_id = l.lecture_head_unit_id) AND l.lecture_id = ?";
 		
 		try(PreparedStatement statement = connProvider.get().prepareStatement(query)){
-			statement.setObject(1, lectureId);
-			
+			statement.setObject(1, lectureId);			
 			try(ResultSet resultSet = statement.executeQuery()){
 				if(resultSet.next())
 					headUnit = unitProvider.get().fromResultSet(resultSet);			
 			}
 		}
 		catch(SQLException e){
-			Log.info("Unable to resolve lectureHeadUnit: " + e.getMessage());
 			throw new RuntimeException("Unable to resolve lectureHeadUnit: " + e.getMessage());
 		}
 		
@@ -151,6 +185,7 @@ public class LectureManager {
 		return lecture;
 	}
 	
+	/**Insert new {@link Lecture} into database.*/
 	public Lecture insert(Lecture lecture){
 		
 		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id, lecture_keywords) VALUES (?, ?, ?, ?)";	
@@ -169,13 +204,13 @@ public class LectureManager {
 			}
 		}			
 		catch (SQLException e) {
-			Log.info("Unable to insert Lecture: " + e.getMessage());
 			throw new RuntimeException("Unable to insert Lecture" + e.getMessage());
 		}
 		
 		return lecture;
 	}
 	
+	/**Update {@link Lecture} in database for given ID*/
 	public Lecture update(UUID lectureBeforeId, Lecture lectureAfter){
 		
 		String query = "UPDATE lectures SET lecture_title = ?, lecture_description = ?, author_id = ?, lecture_keywords = ? WHERE lecture_id = ?";
@@ -193,13 +228,13 @@ public class LectureManager {
 				throw new SQLException("Something went wrong during insert operation");
 		}
 		catch (SQLException e) {
-			Log.info("Unable to update Lecture: " + e.getMessage());
 			throw new RuntimeException("Unable to update lecture: " + e.getMessage());
 		}
 
 		return lectureAfter;
 	}
 	
+	/**Delete {@link Lecture} from database and all FK relations for given ID}*/
 	public Lecture delete(Lecture lecture){
 				
 		String query = "SELECT course_id FROM course_lectures WHERE lecture_id = ?";
@@ -223,14 +258,13 @@ public class LectureManager {
 				throw new SQLException("Something went wrong during delete operation");
 		} 
 		catch (SQLException e) {
-			Log.info("Delete failed: " + e.getMessage());
 			throw new RuntimeException("Delete failed: " + e.getMessage());
 		}
 
 		return lecture;
 	}
 	
-	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
+//	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
 
 	private final Provider<UserManager> userProvider;
 	private final Provider<UnitManager> unitProvider;
