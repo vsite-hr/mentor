@@ -126,8 +126,8 @@ public class UnitManager {
 		List<Unit> units = new ArrayList<>();
 		
 		try (PreparedStatement statement = connProvider.get().prepareStatement(
-			"SELECT * FROM lecture_units" +
-			"	JOIN units ON lecture_units.unit_id = units.unit_id" +
+			"SELECT units.* FROM units" +
+			"	JOIN lecture_units ON lecture_units.unit_id = units.unit_id" +
 			"	WHERE lecture_units.lecture_id = ?" +
 			"	ORDER BY lecture_units.unit_ordinal ASC"
 		)) {
