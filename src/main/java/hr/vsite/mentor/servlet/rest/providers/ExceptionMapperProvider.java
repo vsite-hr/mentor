@@ -2,6 +2,7 @@ package hr.vsite.mentor.servlet.rest.providers;
 
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -38,7 +39,7 @@ public class ExceptionMapperProvider implements ExceptionMapper<Throwable> {
 		else
 			Log.error("Unhandled API exception", exception);
 			
-		return Response.status(error.getCode()).entity(error).build();
+		return Response.status(error.getCode()).type(MediaType.APPLICATION_JSON_TYPE).entity(error).build();
 		
 	}
 
