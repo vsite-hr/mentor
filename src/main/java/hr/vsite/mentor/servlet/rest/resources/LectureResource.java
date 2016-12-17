@@ -1,6 +1,7 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
 import java.nio.file.Files;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -16,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -111,8 +113,9 @@ public class LectureResource {
 			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
 		
 		List<Unit> units = unitProvider.get().list(lecture);
-		
-		return Response.status(200).entity(units).build();
+
+		GenericEntity<List<Unit>> entity = new GenericEntity<List<Unit>>(units) {};	// anonymous class wrapper to save type lost during type erasure
+		return Response.status(200).entity(entity).build();
 	}
 	
 	@GET
