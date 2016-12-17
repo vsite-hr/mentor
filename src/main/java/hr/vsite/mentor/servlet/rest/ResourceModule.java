@@ -37,7 +37,6 @@ public class ResourceModule extends AbstractModule {
 		
 		// params
 		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(User.class)).to(UserParamConverter.class);
-		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(User.class)).to(UserParamConverter.class);
 		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Course.class)).to(CourseParamConverter.class);
 		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Lecture.class)).to(LectureParamConverter.class);
 		bind(ParamConverter.class).annotatedWith(JaxRsParams.forClass(Unit.class)).to(UnitParamConverter.class);
