@@ -84,34 +84,6 @@ public class LectureResource {
 	}
 	
 	@GET
-	@Path("units/{lectureId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public Response units(@PathParam("lectureId") Lecture lecture){
-		
-		if(lecture == null)
-			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
-		
-		List<Unit> units = unitProvider.get().list(lecture);
-		if(units == null)
-			return Response.status(204).build();
-		
-		return Response.status(200).entity(units).build();
-	}
-	
-	@GET
-	@Path("units/count/{lectureId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public int unitsCount(@PathParam("lectureId") Lecture lecture){
-		
-		if(lecture == null)
-			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
-		
-		return unitProvider.get().count(lecture);
-	}
-	
-	@GET
 	@Path("{lectureId}/thumbnail")
 	@Transactional
 	public Response photo(@PathParam("lectureId") Lecture lecture){
@@ -127,6 +99,32 @@ public class LectureResource {
 		}
 		
 		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
+	}
+	
+	@GET
+	@Path("{lectureId}/units")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response units(@PathParam("lectureId") Lecture lecture){
+		
+		if(lecture == null)
+			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
+		
+		List<Unit> units = unitProvider.get().list(lecture);
+		
+		return Response.status(200).entity(units).build();
+	}
+	
+	@GET
+	@Path("{lectureId}/units/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public int unitsCount(@PathParam("lectureId") Lecture lecture){
+		
+		if(lecture == null)
+			throw new NotFoundException("There is no Lecture with this ID, please provide other ID !!");
+		
+		return unitProvider.get().count(lecture);
 	}
 	
 	@POST
