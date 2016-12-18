@@ -5,10 +5,16 @@ import java.nio.file.Path;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gwt.core.shared.GwtIncompatible;
 
-public class VideoUnit extends Unit {
+public class ImageUnit extends Unit {
 
 	public static class Attributes {
 
+		@JsonProperty
+		public String getFilename() { return filename; }
+		public void setFilename(String filename) { this.filename = filename; }
+		@JsonProperty
+		public String getContentType() { return contentType; }
+		public void setContentType(String contentType) { this.contentType = contentType; }
 		@JsonProperty
 		public int getWidth() { return width; }
 		public void setWidth(int width) { this.width = width; }
@@ -16,12 +22,14 @@ public class VideoUnit extends Unit {
 		public int getHeight() { return height; }
 		public void setHeight(int height) { this.height = height; }
 		@JsonProperty
-		public int getDuration() { return duration; }
-		public void setDuration(int duration) { this.duration = duration; }
+		public String getCaption() { return caption; }
+		public void setCaption(String caption) { this.caption = caption; }
 
+		private String filename;
+		private String contentType;
 		private int width;
 		private int height;
-		private int duration;
+		private String caption;
 		
 	}
 
@@ -33,23 +41,23 @@ public class VideoUnit extends Unit {
 	@Override
 	@GwtIncompatible
 	public Path getThumbnailPath() {
-		return getDataFolder().resolve(getId() + ".jpg");
+		return getImagePath();
 	}
 
 	@Override
 	@GwtIncompatible
 	public String getThumbnailContentType() {
-		return "image/jpeg";
+		return getImageContentType();
 	}
 
 	@GwtIncompatible
-	public Path getVideoPath() {
-		return getDataFolder().resolve(getId() + ".mp4");
+	public Path getImagePath() {
+		return getDataFolder().resolve(getAttributes().getFilename());
 	}
 
 	@GwtIncompatible
-	public String getVideoContentType() {
-		return "video/mp4";
+	public String getImageContentType() {
+		return getAttributes().getContentType();
 	}
 
 }

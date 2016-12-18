@@ -4,6 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 
+import hr.vsite.mentor.unit.ImageUnit;
 import hr.vsite.mentor.unit.TextUnit;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.VideoUnit;
@@ -12,7 +13,6 @@ import gwt.material.design.client.constants.HeadingSize;
 import gwt.material.design.client.constants.IconPosition;
 import gwt.material.design.client.constants.IconType;
 import gwt.material.design.client.constants.WavesType;
-import gwt.material.design.client.ui.MaterialIcon;
 import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialRow;
@@ -27,7 +27,7 @@ public abstract class UnitWidget extends MaterialPanel {
 			case Text: return new TextUnitWidget((TextUnit) unit);
 			case Video: return new VideoUnitWidget((VideoUnit) unit);
 			case Audio: return new UnknownUnitWidget(unit);
-			case Image: return new UnknownUnitWidget(unit);
+			case Image: return new ImageUnitWidget((ImageUnit) unit);
 			case YouTube: return new UnknownUnitWidget(unit);
 		}
 		return new UnknownUnitWidget(unit);

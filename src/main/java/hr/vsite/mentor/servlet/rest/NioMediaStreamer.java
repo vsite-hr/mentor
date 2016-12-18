@@ -40,7 +40,7 @@ public class NioMediaStreamer implements StreamingOutput {
     	}
     }
 
-    public long getLenth() {
+    public long getLength() {
         return length;
     }
    

@@ -72,7 +72,7 @@ public class VideoUnitWidget extends UnitWidget {
 
 		if (video != null) {
 			video.setSrc(GWT.getHostPageBaseURL() + "api/units/" + unit.getId() + "/content");
-			// set poster?
+			video.setPoster(GWT.getHostPageBaseURL() + "api/units/" + unit.getId() + "/thumbnail");
 		}
 		
 	}

@@ -178,7 +178,9 @@ public class UnitManager {
 				case Audio:
 					throw new NotImplementedException("Audio unit not implemented");
 				case Image:
-					throw new NotImplementedException("Image unit not implemented");
+					unit = new ImageUnit();
+					unit.setAttributes(mapper.readValue(attributesAsString, ImageUnit.Attributes.class));
+					break;
 				case YouTube:
 					throw new NotImplementedException("YouTube unit not implemented");
 			}

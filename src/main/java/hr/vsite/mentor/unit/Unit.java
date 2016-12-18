@@ -54,6 +54,8 @@ public abstract class Unit {
 	/** Override if derived unit can provide thumbnail */
 	@GwtIncompatible
 	public Path getThumbnailPath() { return null; }
+	@GwtIncompatible
+	public String getThumbnailContentType() { return null; }
 
 	@Override
 	public int hashCode() {
