@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -34,11 +36,16 @@ public class UnitManager {
 
 	/** Returns <code>Unit</code> with corresponding id, or <code>null</code> if such unit does not exist. */
 	public Unit findById(UUID id) {
+		return findById(id, new HashSet<>());
+	}
+	
+	/** Descends recursively together with fromResultSet into parsing next unit(s) and detects circular dependencies. */
+	private Unit findById(UUID id, Set<Unit> ancestors) {
 		
 	    try (PreparedStatement statement = connProvider.get().prepareStatement("SELECT * FROM units WHERE unit_id = ?")) {
 		    statement.setObject(1, id);
 	        try (ResultSet resultSet = statement.executeQuery()) {
-	        	return resultSet.next() ? fromResultSet(resultSet) : null;
+	        	return resultSet.next() ? fromResultSet(resultSet, ancestors) : null;
 	        }
 		} catch (SQLException e) {
 			throw new RuntimeException("Unable to find unit with id " + id, e);
@@ -146,6 +153,11 @@ public class UnitManager {
 
 	/** Parses given ResultSet and extract Unit instance from it. */
 	public Unit fromResultSet(ResultSet resultSet) {
+		return fromResultSet(resultSet, new HashSet<>());
+	}
+	
+	/** Descends recursively together with findById into parsing next unit(s) and detects circular dependencies. */
+	private Unit fromResultSet(ResultSet resultSet, Set<Unit> ancestors) {
 
 		try {
 			
@@ -167,10 +179,6 @@ public class UnitManager {
 					throw new NotImplementedException("Audio unit not implemented");
 				case Image:
 					throw new NotImplementedException("Image unit not implemented");
-				case Quiz:
-					throw new NotImplementedException("Quiz unit not implemented");
-				case Series:
-					throw new NotImplementedException("Series unit not implemented");
 				case YouTube:
 					throw new NotImplementedException("YouTube unit not implemented");
 			}
@@ -184,7 +192,15 @@ public class UnitManager {
 			unit.setTitle(resultSet.getString("unit_title"));
 			unit.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
 			unit.setKeywords(JdbcUtils.array2List(resultSet.getArray("unit_keywords"), String[].class));
+
+			if (ancestors.contains(unit))
+				throw new RuntimeException("Circular unit reference detected (" + unit + ")");
 			
+			ancestors.add(unit);
+			UUID nextUnitId = UUID.class.cast(resultSet.getObject("next_unit_id"));
+			if (nextUnitId != null)
+				unit.setNextUnit(findById(nextUnitId, ancestors));
+
 			return unit;
 
 		} catch (SQLException | IOException e) {

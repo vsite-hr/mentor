@@ -142,7 +142,7 @@ public class LectureView extends MaterialPanel {
 				MaterialToast.fireToast("Nije moguće učitati lekciju! " + exception);
 			}
 		}));
-		loader.add(LoadComponent.Units, Api.get().unit().list(null, null, null, place.getLectureId(), 100, 0, new MethodCallback<List<Unit>>() {
+		loader.add(LoadComponent.Units, Api.get().lecture().getUnits(place.getLectureId(), new MethodCallback<List<Unit>>() {
 			@Override
 			public void onSuccess(Method method, List<Unit> units) {
 				LectureView.this.units = units;

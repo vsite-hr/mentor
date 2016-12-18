@@ -19,8 +19,8 @@ public abstract class Unit {
 		Video,
 		Audio,
 		Image,
-		Quiz,
-		Series,
+		//Quiz,
+		//Series,
 		YouTube
 	}
 	
@@ -47,6 +47,9 @@ public abstract class Unit {
 	@JsonProperty
 	public Object getAttributes() { return attributes; }
 	public void setAttributes(Object attributes) { this.attributes = attributes; }
+	@JsonProperty
+	public Unit getNextUnit() { return nextUnit; }
+	public void setNextUnit(Unit nextUnit) { this.nextUnit = nextUnit; }
 
 	/** Override if derived unit can provide thumbnail */
 	@GwtIncompatible
@@ -88,5 +91,6 @@ public abstract class Unit {
 	private User author;
 	private List<String> keywords;
 	private Object attributes;
+	private Unit nextUnit;
 	
 }

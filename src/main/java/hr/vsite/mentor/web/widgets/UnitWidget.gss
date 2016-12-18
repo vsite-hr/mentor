@@ -22,4 +22,24 @@
 .content {
 	padding: 10px;
 	line-height: 1.8;
+	margin-bottom: 0;
+}
+
+.next {
+}
+
+.nextLink {
+	margin-left: 1rem;
+}
+
+.nextLink > i {
+	margin-right: 0;
+}
+
+.sub {
+	margin: 0;
+}
+
+.sub .title {
+	font-size: 1.2rem;
 }

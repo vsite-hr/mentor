@@ -125,7 +125,7 @@ putnami {
 		strict = false
 		noServer = true
 		war = 'build/war/main'
-		//extraArgs = ["-Dgwt.persistentunitcachedir=build/sdm"]
+		extraArgs = ["-launcherDir build/war/main"]
 		/** Java args */
 		maxHeapSize = "1024m"
 		minHeapSize = "512m"

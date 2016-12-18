@@ -1,5 +1,8 @@
 package hr.vsite.mentor.web.widgets;
 
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
@@ -8,6 +11,7 @@ import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.web.Places;
 import hr.vsite.mentor.web.places.LecturePlace;
+import hr.vsite.mentor.web.services.Api;
 
 import gwt.material.design.client.constants.Color;
 import gwt.material.design.client.constants.HeadingSize;
@@ -101,9 +105,10 @@ public class LectureWidget extends MaterialPanel {
 		titleLink.setHref(lectureHref);
 		title.setText(lecture.getTitle());
 		imageLink.setHref(lectureHref);
-		image.setUrl("https://www.vsite.hr/sites/default/files/promocija2015_027.JPG");	// TODO
+		image.setUrl(GWT.getHostPageBaseURL() + "api/lectures/" + lecture.getId() + "/thumbnail");
 		description.setText(lecture.getDescription());
-		unitsLink.setText("13 poglavlja");	// TODO
+		unitsLink.setText("...");
+		unitsLink.setTitle("Učitavam broj poglavlja");
 		unitsLink.setHref(lectureHref);
 		
 		keywordsContainer.clear();
@@ -113,6 +118,19 @@ public class LectureWidget extends MaterialPanel {
 				chip.addStyleName(res.style().keyword());
 				keywordsContainer.add(chip);
 			}
+
+		Api.get().lecture().getUnitsCount(lecture.getId(), new MethodCallback<Integer>() {
+			@Override
+			public void onSuccess(Method method, Integer count) {
+				unitsLink.setText(count + " poglavlja");
+				unitsLink.setTitle("");
+			}
+			@Override
+			public void onFailure(Method method, Throwable exception) {
+				unitsLink.setText("<?!?>");
+				unitsLink.setTitle("Pogreška prilikom učitavanja broja poglavlja");
+			}
+		});
 		
 	}
 
