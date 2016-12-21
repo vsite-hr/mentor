@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 
@@ -103,21 +104,21 @@ public class CourseManager {
 	/**
 	 * Deletes a <code>Course</code> from database.
 	 */
-	public void delete(Course course) {
+	public Course delete(Course course) {
 		
-		String msg = String.format("User: %s, Deleting Course: %s", userProvider.get().me(), course.toString());
-		Log.trace(msg);
-		String query = "DELETE FROM courses WHERE course_id=?";
+		if(findById(course.getId()) == null) {
+			throw new NotFoundException("Course " + course.toString() + " Not Found");
+		}
+		String query = "BEGIN; DELETE FROM course_lectures WHERE course_id=?; DELETE FROM courses WHERE course_id=?; COMMIT;";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
 			int index = 0;
 			statement.setObject(++index, course.getId());
-			if(statement.executeUpdate() == 1) {
-				Log.info("User: {}, Deleted Course: {}", userProvider.get().me(), course.toString());
-			}
-			else
-				throw new InternalServerErrorException("Error: Unable To Delete Course, " + msg);
+			statement.setObject(++index, course.getId());
+			statement.executeUpdate();
+			Log.info("User: {} Deleted Course: {}", userProvider.get().me(), course.toString());
+			return course;
 		} catch (SQLException e) {
-			throw new InternalServerErrorException("Error: Unable To Delete Course, " + msg, e);
+			throw new InternalServerErrorException("Unable To Delete Course " + course.toString() + " By User " + userProvider.get().me(), e);
 		}
 	}
 
