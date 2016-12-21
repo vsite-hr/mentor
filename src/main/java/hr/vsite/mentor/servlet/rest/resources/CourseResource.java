@@ -6,8 +6,10 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.transaction.Transactional;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,25 +38,19 @@ public class CourseResource {
 	@Transactional
 	public List<Course> list(@QueryParam("title") String title, @QueryParam("author") User author,
 			@QueryParam("count") Integer count, @QueryParam("offset") Integer offset) {
-
 		CourseFilter filter = new CourseFilter();
 		filter.setTitle(title);
 		filter.setAuthor(author);
-
 		return courseProvider.get().list(filter, count, offset);
-
 	}
 
 	@GET
 	@Path("{course}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Course findById(@PathParam("course") Course course) {
-
 		if (course == null)
-			throw new NotFoundException();
-
+			throw new NotFoundException("Course Not Found");
 		return course;
-
 	}
 
 	@POST
@@ -75,12 +71,15 @@ public class CourseResource {
 	}
 	
 	@DELETE
-	@Path("{course}")
+	@Path("{id}")
 	@Transactional
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response delete(@PathParam("course") Course course) {
-		courseProvider.get().delete(course);
-		return Response.status(204).build();
+	public Response delete(@PathParam("id") UUID id, Course course) {
+		if(!id.equals(course.getId())) {
+			throw new ClientErrorException("Course ID error", 400);
+		}
+		return Response.status(200).entity(courseProvider.get().delete(course)).build();
 	}
 
 	private final Provider<CourseManager> courseProvider;
