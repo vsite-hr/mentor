@@ -66,8 +66,11 @@ public class CourseResource {
 	@Transactional
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") UUID idToUpdate, Course newValues) {
-		return Response.status(200).entity(courseProvider.get().update(idToUpdate, newValues)).build();
+	public Response update(@PathParam("id") UUID id, Course newValues) {
+		if(!id.equals(newValues.getId())) {
+			throw new ClientErrorException("Course ID error", 400);
+		}
+		return Response.status(200).entity(courseProvider.get().update(newValues)).build();
 	}
 	
 	@DELETE

@@ -18,6 +18,7 @@ import javax.ws.rs.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hr.vsite.mentor.db.JdbcUtils;
 import hr.vsite.mentor.user.UserManager;
 
 public class CourseManager {
@@ -34,71 +35,60 @@ public class CourseManager {
 	 */
 	public Course insert(Course course) {
 
-		String msg = String.format("User: %s, Creating Course: %s", userProvider.get().me(), course.toString());
-		Log.trace(msg);
 		if (course.getTitle() == null || course.getDescription() == null || course.getAuthor() == null) {
-			throw new BadRequestException("Error: Missing Parameter(s), " + msg);
+			throw new BadRequestException("Missing Parameter(s) on creating course by user " + userProvider.get().me());
 		}
-		String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, ?)";
+		String query = "INSERT INTO courses VALUES (DEFAULT, ?, ?, ?, ?)";
+		
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query,
 				PreparedStatement.RETURN_GENERATED_KEYS)) {
 			int index = 0;
 			statement.setString(++index, course.getTitle());
 			statement.setString(++index, course.getDescription());
 			statement.setObject(++index, course.getAuthor().getId());
+			statement.setArray(++index, connProvider.get().createArrayOf("text", course.getKeywords().toArray()));
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
 			if (result.next()) {
 				course.setId(UUID.class.cast(result.getObject(1)));
-				Log.info("User: {}, Created Course: {}", userProvider.get().me(), course.toString());
-				return course;
+				Log.info("User {} created course {}", userProvider.get().me(), course.toString());
 			}
-			else
-				throw new InternalServerErrorException("Error: Unable To Create Course, " + msg);
 		} catch (SQLException e) {
 			if(e.getSQLState().equals("23503")) // Error Name: foreign_key_violation
-				throw new BadRequestException(msg, e);
-			throw new InternalServerErrorException("Error: Unable To Create Course, " + msg, e);
+				throw new BadRequestException(e);
+			throw new InternalServerErrorException("Unable to create course by user " + userProvider.get().me(), e);
 		}
-
+		return course;
 	}
 
 	/**
 	 * Updates existing <code>Course</code> in database. Returns <code>Course</code>
 	 * if successful.
 	 */
-	public Course update(UUID idToUpdate, Course newValues) {
+	public Course update(Course newValues) {
 		
-		String msg = String.format("User: %s, Updating Course ID: %s With: %s", userProvider.get().me(), idToUpdate.toString(), newValues.toString());
-		Log.trace(msg);
-		if(!idToUpdate.equals(newValues.getId()))
-			throw new BadRequestException("Error: ID Conflict, " + msg);
-		newValues.setId(idToUpdate);
 		if (newValues.getTitle() == null || newValues.getDescription() == null || newValues.getAuthor() == null) {
-			throw new BadRequestException("Error: Missing Parameter(s), " + msg);
+			throw new BadRequestException("Missing Parameter(s) on updating course by user " + userProvider.get().me());
 		}
-		
 		if(findById(newValues.getId()) == null) {
-			Log.info("Aborted - no such course exists in database");
-			throw new NotFoundException("Error: No Such Course, " + msg);
+			throw new NotFoundException("Course " + newValues.toString() + " not found while updating by user " + userProvider.get().me());
 		}
 		
-		String query = "UPDATE courses SET course_title=?, course_description=?, author_id=? WHERE course_id=?";
+		String query = "UPDATE courses SET course_title=?, course_description=?, author_id=?, course_keywords=? WHERE course_id=?";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
 			int index = 0;
 			statement.setString(++index, newValues.getTitle());
 			statement.setString(++index, newValues.getDescription());
 			statement.setObject(++index, newValues.getAuthor().getId());
+			statement.setArray(++index, connProvider.get().createArrayOf("text", newValues.getKeywords().toArray()));
 			statement.setObject(++index, newValues.getId());
 			if(statement.executeUpdate() == 1) {
-				Log.info("User: {}, Updated Course: {}", userProvider.get().me(), newValues.toString());
-				return newValues;
+				Log.info("User {} updated course {}", userProvider.get().me(), newValues.toString());
 			}
-			else
-				throw new InternalServerErrorException("Error: Unable To Update Course, " + msg);
 		} catch (SQLException e) {
-			throw new InternalServerErrorException("Error: Unable To Update Course, " + msg, e);
+			throw new InternalServerErrorException("Unable to update course by user " + userProvider.get().me(), e);
 		}
+		return newValues;
 	}
 	
 	/**
@@ -107,7 +97,7 @@ public class CourseManager {
 	public Course delete(Course course) {
 		
 		if(findById(course.getId()) == null) {
-			throw new NotFoundException("Course " + course.toString() + " Not Found");
+			throw new NotFoundException("Course " + course.toString() + " not found while deleting by user " + userProvider.get().me());
 		}
 		String query = "BEGIN; DELETE FROM course_lectures WHERE course_id=?; DELETE FROM courses WHERE course_id=?; COMMIT;";
 		try (PreparedStatement statement = connProvider.get().prepareStatement(query)) {
@@ -137,7 +127,6 @@ public class CourseManager {
 		} catch (Exception e) {
 			throw new NotFoundException("Unable to find course with id " + id, e);
 		}
-
 	}
 
 	/**
@@ -216,12 +205,11 @@ public class CourseManager {
 			course.setTitle(resultSet.getString("course_title"));
 			course.setDescription(resultSet.getString("course_description"));
 			course.setAuthor(userProvider.get().findById(UUID.class.cast(resultSet.getObject("author_id"))));
+			course.setKeywords(JdbcUtils.array2List(resultSet.getArray("course_keywords"), String[].class));
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Unable to resolve course from result set", e);
 		}
-
 		return course;
-
 	}
 
 	private static final Logger Log = LoggerFactory.getLogger(CourseManager.class);

@@ -1,5 +1,6 @@
 package hr.vsite.mentor.course;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,6 +23,9 @@ public class Course {
 	@JsonProperty
 	public User getAuthor() { return author; }
 	public void setAuthor(User author) { this.author = author; }
+	@JsonProperty
+	public List<String> getKeywords() { return keywords; }
+	public void setKeywords(List<String> keywords) { this.keywords = keywords; }
 	
 	@Override
 	public int hashCode() {
@@ -57,5 +61,5 @@ public class Course {
 	private String title;
 	private String description;
 	private User author;
-
+	private List<String> keywords;
 }
