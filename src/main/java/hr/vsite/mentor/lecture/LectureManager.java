@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.InternalServerErrorException;
+
 //import gwt.material.design.jscore.client.api.Array;
 import hr.vsite.mentor.Mentor;
 import hr.vsite.mentor.course.Course;
@@ -17,6 +19,9 @@ import hr.vsite.mentor.db.JdbcUtils;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.UnitManager;
 import hr.vsite.mentor.user.UserManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LectureManager {
 
@@ -264,7 +269,26 @@ public class LectureManager {
 		return lecture;
 	}
 	
-//	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
+	/** Returns all lectures, in proper order, that given {@link Unit} is part of.*/
+	public List<Lecture> list(Unit unit){
+		
+		List<Lecture> lectures = new ArrayList<Lecture>();
+		String query = "SELECT * FROM lectures JOIN lecture_units ON (lectures.lecture_id = lecture_units.lecture_id) WHERE lecture_units.unit_id = ? ORDER BY lecture_units.unit_ordinal ASC";
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, unit.getId());
+			try(ResultSet resultSet = statement.executeQuery()){
+				while(resultSet.next())
+					lectures.add(lectureFromResultSet(resultSet));			
+			}
+		}
+		catch(SQLException e){
+			throw new InternalServerErrorException("Unable to list lectures for unit " + unit.toString(), e);
+		}
+		Log.debug("User {} listed lectures that unit {} is part of", userProvider.get().me(), unit.toString());
+		return lectures;
+	}
+	
+	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
 
 	private final Provider<UserManager> userProvider;
 	private final Provider<UnitManager> unitProvider;

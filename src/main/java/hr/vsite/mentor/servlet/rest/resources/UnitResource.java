@@ -18,11 +18,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.lecture.LectureManager;
 import hr.vsite.mentor.servlet.rest.NioMediaStreamer;
 import hr.vsite.mentor.unit.ImageUnit;
 import hr.vsite.mentor.unit.Unit;
@@ -35,8 +37,9 @@ import hr.vsite.mentor.user.User;
 public class UnitResource {
 
 	@Inject
-	public UnitResource(Provider<UnitManager> unitProvider) {
+	public UnitResource(Provider<UnitManager> unitProvider, Provider<LectureManager> lectureProvider) {
 		this.unitProvider = unitProvider;
+		this.lectureProvider = lectureProvider;
 	}
 	
 	@GET
@@ -211,6 +214,20 @@ public class UnitResource {
 		
 	}
 	
+	@GET
+	@Path("{unit}/lectures")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response getLectures(@PathParam("unit") Unit unit) {
+
+		if (unit == null)
+			throw new NotFoundException("Unit not found");
+		
+		List<Lecture> lectures = lectureProvider.get().list(unit);
+		GenericEntity<List<Lecture>> entity = new GenericEntity<List<Lecture>>(lectures) {};	// anonymous class wrapper to save type lost during type erasure
+		return Response.status(200).entity(entity).build();
+	}
+	
 	private final Provider<UnitManager> unitProvider;
-    
+	private final Provider<LectureManager> lectureProvider;
 }
