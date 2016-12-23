@@ -109,7 +109,7 @@ public class LectureManager {
 		
 		List<Lecture> lectures = new ArrayList<Lecture>();
 		
-		String query = "SELEC lectures.* FROM lectures "
+		String query = "SELECT lectures.* FROM lectures "
 						+ "JOIN course_lectures ON (lectures.lecture_id = course_lectures.lecture_id) "
 						+ "WHERE course_lectures.course_id = ? "
 						+ "ORDER BY course_lectures.lecture_ordinal ASC";

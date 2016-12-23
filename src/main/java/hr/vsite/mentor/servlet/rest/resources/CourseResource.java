@@ -23,6 +23,8 @@ import javax.ws.rs.core.Response;
 import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.course.CourseFilter;
 import hr.vsite.mentor.course.CourseManager;
+import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.lecture.LectureManager;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.user.User;
 
@@ -30,8 +32,9 @@ import hr.vsite.mentor.user.User;
 public class CourseResource {
 
 	@Inject
-	public CourseResource(Provider<CourseManager> courseProvider) {
+	public CourseResource(Provider<CourseManager> courseProvider, Provider<LectureManager> lectureProvider) {
 		this.courseProvider = courseProvider;
+		this.lectureProvider = lectureProvider;
 	}
 
 	@GET
@@ -81,6 +84,26 @@ public class CourseResource {
 		}		
 		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
 	}
+	
+	@GET
+	@Path("{course}/lectures")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response getLectures(@PathParam("course") Course course) {
+		if(course == null)
+			throw new NotFoundException("Course not found");
+		return Response.status(200).entity(lectureProvider.get().list(course)).build();
+	}
+	
+	@GET
+	@Path("{course}/lectures/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public int getLecturesCount(@PathParam("course") Course course) {
+		if(course == null)
+			throw new NotFoundException("Course not found");
+		return lectureProvider.get().count(course);
+	}
 
 	@POST
 	@Transactional
@@ -112,4 +135,5 @@ public class CourseResource {
 		return Response.status(200).entity(courseProvider.get().delete(course)).build();
 	}
 	private final Provider<CourseManager> courseProvider;
+	private final Provider<LectureManager> lectureProvider;
 }
