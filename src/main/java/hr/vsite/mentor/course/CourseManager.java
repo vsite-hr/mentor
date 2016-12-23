@@ -11,7 +11,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 
@@ -19,14 +18,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import hr.vsite.mentor.db.JdbcUtils;
+import hr.vsite.mentor.unit.Unit;
+import hr.vsite.mentor.unit.UnitManager;
 import hr.vsite.mentor.user.UserManager;
 
 public class CourseManager {
 
 	@Inject
-	public CourseManager(Provider<UserManager> userProvider, Provider<Connection> connProvider) {
+	public CourseManager(Provider<UserManager> userProvider, Provider<Connection> connProvider, Provider<UnitManager> unitProvider) {
 		this.userProvider = userProvider;
 		this.connProvider = connProvider;
+		this.unitProvider = unitProvider;
 	}
 
 	/**
@@ -212,9 +214,28 @@ public class CourseManager {
 		return course;
 	}
 
+	/** Returns head {@link Unit} for given {@link Course}.*/
+	public Unit getHeadUnit(Course course) {
+		
+		Unit headUnit = null;
+		String query = "SELECT * FROM units JOIN courses ON (unit_id=course_head_unit_id) AND course_id=?";
+		try(PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, course.getId());			
+			try(ResultSet resultSet = statement.executeQuery()){
+				if(resultSet.next())
+					headUnit = unitProvider.get().fromResultSet(resultSet);			
+			}
+		}
+		catch(SQLException e){
+			throw new InternalServerErrorException("Unable to resolve head unit in course " + course.toString() + " for user " + userProvider.get().me(), e);
+		}
+		Log.debug("Returned head unit in course {} for user {}", course.toString(), userProvider.get().me());
+		return headUnit;
+	}
+	
 	private static final Logger Log = LoggerFactory.getLogger(CourseManager.class);
 
 	private final Provider<UserManager> userProvider;
 	private final Provider<Connection> connProvider;
-
+	private final Provider<UnitManager> unitProvider;
 }

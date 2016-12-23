@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -23,6 +22,7 @@ import javax.ws.rs.core.Response;
 import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.course.CourseFilter;
 import hr.vsite.mentor.course.CourseManager;
+import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.user.User;
 
 @Path("courses")
@@ -49,8 +49,21 @@ public class CourseResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Course findById(@PathParam("course") Course course) {
 		if (course == null)
-			throw new NotFoundException("Course Not Found");
+			throw new NotFoundException("Course not found");
 		return course;
+	}
+	
+	@GET
+	@Path("{course}/head")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response getHeadUnit(@PathParam("course") Course course) {
+		if(course == null)
+			throw new NotFoundException("Course not found");
+		Unit headUnit = courseProvider.get().getHeadUnit(course);
+		if(headUnit == null)
+			return Response.status(204).build();
+		return Response.status(200).entity(headUnit).build();
 	}
 
 	@POST
@@ -67,9 +80,8 @@ public class CourseResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") UUID id, Course newValues) {
-		if(!id.equals(newValues.getId())) {
+		if(!id.equals(newValues.getId()))
 			throw new ClientErrorException("Course ID error", 400);
-		}
 		return Response.status(200).entity(courseProvider.get().update(newValues)).build();
 	}
 	
@@ -79,12 +91,10 @@ public class CourseResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") UUID id, Course course) {
-		if(!id.equals(course.getId())) {
+		if(!id.equals(course.getId()))
 			throw new ClientErrorException("Course ID error", 400);
-		}
 		return Response.status(200).entity(courseProvider.get().delete(course)).build();
 	}
 
 	private final Provider<CourseManager> courseProvider;
-
 }
