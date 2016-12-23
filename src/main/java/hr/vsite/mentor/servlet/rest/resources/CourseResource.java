@@ -1,5 +1,6 @@
 package hr.vsite.mentor.servlet.rest.resources;
 
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,6 +66,21 @@ public class CourseResource {
 			return Response.status(204).build();
 		return Response.status(200).entity(headUnit).build();
 	}
+	
+	@GET
+	@Path("{course}/thumbnail")
+	@Transactional
+	public Response photo(@PathParam("course") Course course) {
+		if(course == null)
+			throw new NotFoundException("Course not found");
+		Unit headUnit = courseProvider.get().getHeadUnit(course);	
+		if(headUnit != null) {
+			java.nio.file.Path path = headUnit.getThumbnailPath();
+			if (path != null && Files.exists(path))
+				return Response.ok(path.toFile(), "image/jpeg").build();
+		}		
+		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
+	}
 
 	@POST
 	@Transactional
@@ -95,6 +111,5 @@ public class CourseResource {
 			throw new ClientErrorException("Course ID error", 400);
 		return Response.status(200).entity(courseProvider.get().delete(course)).build();
 	}
-
 	private final Provider<CourseManager> courseProvider;
 }
