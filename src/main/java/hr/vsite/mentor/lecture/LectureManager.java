@@ -195,8 +195,7 @@ public class LectureManager {
 		
 		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id, lecture_keywords) VALUES (?, ?, ?, ?)";	
 		
-		try {
-			PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)){
 			int index = 0;
 			statement.setString(++index, lecture.getTitle());
 			statement.setString(++index, lecture.getDescription());
@@ -239,13 +238,16 @@ public class LectureManager {
 		return lectureAfter;
 	}
 	
-	/**Delete {@link Lecture} from database and all FK relations for given ID}*/
+	/**Delete {@link Lecture} from database and all FK relations for given ID}
+	 * @throws SQLException */
+	@SuppressWarnings("resource")
 	public Lecture delete(Lecture lecture){
 				
 		String query = "SELECT course_id FROM course_lectures WHERE lecture_id = ?";
 			
+		PreparedStatement statement = null;
 		try {
-			PreparedStatement statement = connProvider.get().prepareStatement(query);
+			statement = connProvider.get().prepareStatement(query);
 			statement.setObject(1, lecture.getId());
 			ResultSet resultSet = statement.executeQuery();
 			if(resultSet.next())
@@ -264,6 +266,14 @@ public class LectureManager {
 		} 
 		catch (SQLException e) {
 			throw new RuntimeException("Delete failed: " + e.getMessage());
+		}
+		finally{
+			if(statement != null)
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					throw new RuntimeException("Delete failed: " + e.getMessage());
+				}
 		}
 
 		return lecture;
