@@ -23,6 +23,7 @@ mainClassName = 'hr.vsite.mentor.MentorCmd'
 
 repositories {
     jcenter()
+	mavenCentral()
 }
 
 configurations {
@@ -60,7 +61,9 @@ dependencies {
 			'com.github.gwtmaterialdesign:gwt-material-addins:2.0-rc3',
 			'com.github.gwtmaterialdesign:gwt-material-themes:2.0-rc3',
 			'com.github.gwtmaterialdesign:gwt-material-jquery:1.0-rc3',
-			'com.github.gwtmaterialdesign:gwt-material-table:1.0-rc3'
+			'com.github.gwtmaterialdesign:gwt-material-table:1.0-rc3',
+			'com.google.api-client:google-api-client:1.22.0',
+			'com.google.apis:google-api-services-youtube:v3-rev180-1.22.0'
 
 	runtime	'org.postgresql:postgresql:9.4.1211.jre7'
 
