@@ -18,12 +18,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.lecture.LectureManager;
 import hr.vsite.mentor.servlet.rest.NioMediaStreamer;
+import hr.vsite.mentor.unit.ImageUnit;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.UnitFilter;
 import hr.vsite.mentor.unit.UnitManager;
@@ -34,8 +37,9 @@ import hr.vsite.mentor.user.User;
 public class UnitResource {
 
 	@Inject
-	public UnitResource(Provider<UnitManager> unitProvider) {
+	public UnitResource(Provider<UnitManager> unitProvider, Provider<LectureManager> lectureProvider) {
 		this.unitProvider = unitProvider;
+		this.lectureProvider = lectureProvider;
 	}
 	
 	@GET
@@ -77,7 +81,7 @@ public class UnitResource {
 
 	@GET
 	@Path("{unit}/thumbnail")
-	public Response photo(
+	public Response thumbnail(
 		@PathParam("unit") Unit unit
 	) {
 
@@ -86,10 +90,10 @@ public class UnitResource {
 
 		java.nio.file.Path path = unit.getThumbnailPath();
 		if (path != null && Files.exists(path))
-			return Response.ok(path.toFile(), "image/jpeg").build();
-		
-		// TODO if unit is of external type and we can redirect to another url, make it so
-		
+			return Response.ok(path.toFile(), unit.getThumbnailContentType()).build();
+
+		// TODO if unit is of external type and we can redirect to another URL, make it so
+
 		return Response.ok(ClassLoader.getSystemResourceAsStream("unit.jpg"), "image/jpeg").build();
 
 	}
@@ -103,19 +107,37 @@ public class UnitResource {
 		if (unit == null)
 			throw new NotFoundException();
 
-		if (VideoUnit.class.isInstance(unit)) {
-			java.nio.file.Path path = VideoUnit.class.cast(unit).getVideoPath();
-			if (path == null || !Files.exists(path))
-				throw new WebApplicationException("Missing content for MentorVideoUnit " + unit);
-			return Response.ok(null, "video/mp4").status(206)
-	        	.header(HttpHeaders.CONTENT_LENGTH, Files.size(path))
-				.header(HttpHeaders.LAST_MODIFIED, new Date(Files.getLastModifiedTime(path).toMillis()))
-	        	.build();
-		}
-
-		// TODO if unit is of external type and we can redirect to another url, make it so
+		switch (unit.getType()) {
 		
-		throw new NotAcceptableException("Unsupported HEAD request for content of unit " + unit + " (" + unit.getType() + ")");
+			case Video: {
+				VideoUnit videoUnit = VideoUnit.class.cast(unit);
+				java.nio.file.Path path = videoUnit.getVideoPath();
+				if (path == null || !Files.exists(path))
+					throw new WebApplicationException("Missing content for VideoUnit " + unit);
+				return Response.ok(null, videoUnit.getVideoContentType()).status(206)
+		        	.header(HttpHeaders.CONTENT_LENGTH, Files.size(path))
+					.header(HttpHeaders.LAST_MODIFIED, new Date(Files.getLastModifiedTime(path).toMillis()))
+		        	.build();
+			}
+			
+			case Image: {
+				ImageUnit imageUnit = ImageUnit.class.cast(unit);
+				java.nio.file.Path path = imageUnit.getImagePath();
+				if (path == null || !Files.exists(path))
+					throw new WebApplicationException("Missing content for ImageUnit " + unit);
+				return Response.ok(null, imageUnit.getImageContentType()).status(206)
+		        	.header(HttpHeaders.CONTENT_LENGTH, Files.size(path))
+					.header(HttpHeaders.LAST_MODIFIED, new Date(Files.getLastModifiedTime(path).toMillis()))
+		        	.build();
+			}
+				
+			default:
+				throw new NotAcceptableException("Unsupported HEAD request for unit's " + unit + " content (" + unit.getType() + ")");
+				
+		}
+		
+		// TODO if unit is of external type and we can redirect to another URL, make it so
+		
 		
     }
 
@@ -129,46 +151,83 @@ public class UnitResource {
 		if (unit == null)
 			throw new NotFoundException();
 
-		if (VideoUnit.class.isInstance(unit)) {
-			java.nio.file.Path path = VideoUnit.class.cast(unit).getVideoPath();
-			if (path == null || !Files.exists(path))
-				throw new WebApplicationException("Missing content for MentorVideoUnit " + unit);
-			long length = Files.size(path);
-			long from, to;
-			if (range != null) {
-				// stream partial file
-				String[] ranges = range.split("=")[1].split("-");
-				from = Long.parseLong(ranges[0]);
-				if (ranges.length == 2) {
-					to = Long.parseLong(ranges[1]);
-					if (to >= length)
+		switch (unit.getType()) {
+		
+			case Video: {
+
+				VideoUnit videoUnit = VideoUnit.class.cast(unit);
+				java.nio.file.Path path = videoUnit.getVideoPath();
+				if (path == null || !Files.exists(path))
+					throw new WebApplicationException("Missing content for VideoUnit " + unit);
+				long length = Files.size(path);
+				long from, to;
+				if (range != null) {
+					// stream partial file
+					String[] ranges = range.split("=")[1].split("-");
+					from = Long.parseLong(ranges[0]);
+					if (ranges.length == 2) {
+						to = Long.parseLong(ranges[1]);
+						if (to >= length)
+							to = length - 1;
+					} else {
 						to = length - 1;
+					}
 				} else {
+					// stream whole file
+					from = 0;
 					to = length - 1;
 				}
-			} else {
-				// stream whole file
-				from = 0;
-				to = length - 1;
+				
+				String responseRange = String.format("bytes %d-%d/%d", from, to, length);
+				NioMediaStreamer streamer = new NioMediaStreamer(path, from, to);
+		
+				return Response.ok(streamer, videoUnit.getVideoContentType()).status(range != null ? 206 : 200)
+					.header("Accept-Ranges", "bytes")
+					.header("Content-Range", responseRange)
+					.header(HttpHeaders.CONTENT_LENGTH, streamer.getLength())
+					.header(HttpHeaders.LAST_MODIFIED, new Date(Files.getLastModifiedTime(path).toMillis()))
+					.build();
+
+			}
+
+			case Image: {
+
+				ImageUnit imageUnit = ImageUnit.class.cast(unit);
+				java.nio.file.Path path = imageUnit.getImagePath();
+				if (path == null || !Files.exists(path))
+					throw new WebApplicationException("Missing content for ImageUnit " + unit);
+				long length = Files.size(path);
+
+				return Response.ok(path.toFile(), imageUnit.getImageContentType())
+					.header(HttpHeaders.CONTENT_LENGTH, length)
+					.header(HttpHeaders.LAST_MODIFIED, new Date(Files.getLastModifiedTime(path).toMillis()))
+					.build();
+
 			}
 			
-			String responseRange = String.format("bytes %d-%d/%d", from, to, length);
-			NioMediaStreamer streamer = new NioMediaStreamer(path, from, to);
-	
-			return Response.ok(streamer, "video/mp4").status(206)
-				.header("Accept-Ranges", "bytes")
-				.header("Content-Range", responseRange)
-				.header(HttpHeaders.CONTENT_LENGTH, streamer.getLenth())
-				.header(HttpHeaders.LAST_MODIFIED, new Date(Files.getLastModifiedTime(path).toMillis()))
-				.build();
+			default:
+				throw new NotAcceptableException("Unsupported GET request for content of unit " + unit + " (" + unit.getType() + ")");
+				
 		}
 			
-		// TODO if unit is of external type and we can redirect to another url, make it so
-		
-		throw new NotAcceptableException("Unsupported GET request for content of unit " + unit + " (" + unit.getType() + ")");
+		// TODO if unit is of external type and we can redirect to another URL, make it so
 		
 	}
 	
+	@GET
+	@Path("{unit}/lectures")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Response getLectures(@PathParam("unit") Unit unit) {
+
+		if (unit == null)
+			throw new NotFoundException("Unit not found");
+		
+		List<Lecture> lectures = lectureProvider.get().list(unit);
+		GenericEntity<List<Lecture>> entity = new GenericEntity<List<Lecture>>(lectures) {};	// anonymous class wrapper to save type lost during type erasure
+		return Response.status(200).entity(entity).build();
+	}
+	
 	private final Provider<UnitManager> unitProvider;
-    
+	private final Provider<LectureManager> lectureProvider;
 }

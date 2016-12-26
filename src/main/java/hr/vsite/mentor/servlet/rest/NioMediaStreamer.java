@@ -16,9 +16,13 @@ import org.slf4j.LoggerFactory;
 public class NioMediaStreamer implements StreamingOutput {
 
     public NioMediaStreamer(Path path, long from, long to) throws IOException {
+    	
     	this.path = path;
     	this.from = from;
         this.length = to - from + 1;
+        
+        Log.debug("Streaming {} (from {} to {})", path, from, to);
+        
     }
 
     @Override
@@ -36,7 +40,7 @@ public class NioMediaStreamer implements StreamingOutput {
     	}
     }
 
-    public long getLenth() {
+    public long getLength() {
         return length;
     }
    

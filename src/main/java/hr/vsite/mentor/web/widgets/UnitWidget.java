@@ -4,13 +4,20 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 
+import hr.vsite.mentor.unit.ImageUnit;
 import hr.vsite.mentor.unit.TextUnit;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.VideoUnit;
 
 import gwt.material.design.client.constants.HeadingSize;
+import gwt.material.design.client.constants.IconPosition;
+import gwt.material.design.client.constants.IconType;
+import gwt.material.design.client.constants.WavesType;
+import gwt.material.design.client.ui.MaterialLink;
 import gwt.material.design.client.ui.MaterialPanel;
 import gwt.material.design.client.ui.MaterialRow;
+import gwt.material.design.client.ui.animate.MaterialAnimation;
+import gwt.material.design.client.ui.animate.Transition;
 import gwt.material.design.client.ui.html.Heading;
 
 public abstract class UnitWidget extends MaterialPanel {
@@ -20,9 +27,7 @@ public abstract class UnitWidget extends MaterialPanel {
 			case Text: return new TextUnitWidget((TextUnit) unit);
 			case Video: return new VideoUnitWidget((VideoUnit) unit);
 			case Audio: return new UnknownUnitWidget(unit);
-			case Image: return new UnknownUnitWidget(unit);
-			case Quiz: return new UnknownUnitWidget(unit);
-			case Series: return new UnknownUnitWidget(unit);
+			case Image: return new ImageUnitWidget((ImageUnit) unit);
 			case YouTube: return new UnknownUnitWidget(unit);
 		}
 		return new UnknownUnitWidget(unit);
@@ -41,6 +46,9 @@ public abstract class UnitWidget extends MaterialPanel {
 		String title();
 		String badge();
 		String content();
+		String next();
+		String nextLink();
+		String sub();
 	}
 	
 	protected UnitWidget() {
@@ -58,6 +66,21 @@ public abstract class UnitWidget extends MaterialPanel {
 		contentRow.addStyleName(res.style().content());
 		add(contentRow);
 
+		nextRow = new MaterialRow();
+		nextRow.addStyleName(res.style().next());
+		nextRow.setVisible(false);
+		add(nextRow);
+
+//			MaterialIcon nextIcon = new MaterialIcon(IconType.NAVIGATE_NEXT);
+//			nextIcon.setIconPosition(IconPosition.LEFT);
+//			nextIcon.setMarginRight(0);
+		nextLink = new MaterialLink(IconType.NAVIGATE_NEXT);
+		nextLink.setIconPosition(IconPosition.LEFT);
+		nextLink.setWaves(WavesType.DEFAULT);
+		nextLink.addStyleName(res.style().nextLink());
+
+		nextLink.addClickHandler(e -> onNext());
+
 	}
 
 	public Unit getUnit() { return unit; }
@@ -68,6 +91,30 @@ public abstract class UnitWidget extends MaterialPanel {
 		
 		title.setText(unit.getTitle());
 		
+		if (unit.getNextUnit() != null) {
+			nextRow.clear();
+			nextLink.setText(unit.getNextUnit().getTitle());
+			nextLink.setTitle("Idući korak: " + unit.getNextUnit().getTitle());
+			nextRow.add(nextLink);
+			nextRow.setVisible(true);
+		} else {
+			nextRow.setVisible(false);
+		}
+		
+	}
+
+	private void onNext() {
+		
+		nextRow.clear();
+		
+		UnitWidget subWidget = create(unit.getNextUnit());
+		subWidget.addStyleName(res.style().sub());
+		nextRow.add(subWidget);
+
+		MaterialAnimation animation = new MaterialAnimation();
+        animation.setTransition(Transition.SLIDEINLEFT);
+        animation.animate(nextRow);
+
 	}
 
 	protected MaterialPanel getTitlePanel() { return titlePanel; }
@@ -76,6 +123,8 @@ public abstract class UnitWidget extends MaterialPanel {
 	private final MaterialPanel titlePanel;
 	private final Heading title;
 	private final MaterialRow contentRow;
+	private final MaterialRow nextRow;
+	private final MaterialLink nextLink;
 	private Unit unit = null;
 	
 	private static final Resources res = GWT.create(Resources.class);

@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.ws.rs.InternalServerErrorException;
+
 //import gwt.material.design.jscore.client.api.Array;
 import hr.vsite.mentor.Mentor;
 import hr.vsite.mentor.course.Course;
@@ -17,6 +19,9 @@ import hr.vsite.mentor.db.JdbcUtils;
 import hr.vsite.mentor.unit.Unit;
 import hr.vsite.mentor.unit.UnitManager;
 import hr.vsite.mentor.user.UserManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LectureManager {
 
@@ -104,7 +109,7 @@ public class LectureManager {
 		
 		List<Lecture> lectures = new ArrayList<Lecture>();
 		
-		String query = "SELEC lectures.* FROM lectures "
+		String query = "SELECT lectures.* FROM lectures "
 						+ "JOIN course_lectures ON (lectures.lecture_id = course_lectures.lecture_id) "
 						+ "WHERE course_lectures.course_id = ? "
 						+ "ORDER BY course_lectures.lecture_ordinal ASC";
@@ -190,8 +195,7 @@ public class LectureManager {
 		
 		String query = "INSERT INTO lectures (lecture_title, lecture_description, author_id, lecture_keywords) VALUES (?, ?, ?, ?)";	
 		
-		try {
-			PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)){
 			int index = 0;
 			statement.setString(++index, lecture.getTitle());
 			statement.setString(++index, lecture.getDescription());
@@ -234,13 +238,16 @@ public class LectureManager {
 		return lectureAfter;
 	}
 	
-	/**Delete {@link Lecture} from database and all FK relations for given ID}*/
+	/**Delete {@link Lecture} from database and all FK relations for given ID}
+	 * @throws SQLException */
+	@SuppressWarnings("resource")
 	public Lecture delete(Lecture lecture){
 				
 		String query = "SELECT course_id FROM course_lectures WHERE lecture_id = ?";
 			
+		PreparedStatement statement = null;
 		try {
-			PreparedStatement statement = connProvider.get().prepareStatement(query);
+			statement = connProvider.get().prepareStatement(query);
 			statement.setObject(1, lecture.getId());
 			ResultSet resultSet = statement.executeQuery();
 			if(resultSet.next())
@@ -260,11 +267,38 @@ public class LectureManager {
 		catch (SQLException e) {
 			throw new RuntimeException("Delete failed: " + e.getMessage());
 		}
+		finally{
+			if(statement != null)
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					throw new RuntimeException("Delete failed: " + e.getMessage());
+				}
+		}
 
 		return lecture;
 	}
 	
-//	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
+	/** Returns all lectures, in proper order, that given {@link Unit} is part of.*/
+	public List<Lecture> list(Unit unit){
+		
+		List<Lecture> lectures = new ArrayList<Lecture>();
+		String query = "SELECT * FROM lectures JOIN lecture_units ON (lectures.lecture_id = lecture_units.lecture_id) WHERE lecture_units.unit_id = ? ORDER BY lecture_units.unit_ordinal ASC";
+		try (PreparedStatement statement = connProvider.get().prepareStatement(query)){
+			statement.setObject(1, unit.getId());
+			try(ResultSet resultSet = statement.executeQuery()){
+				while(resultSet.next())
+					lectures.add(lectureFromResultSet(resultSet));			
+			}
+		}
+		catch(SQLException e){
+			throw new InternalServerErrorException("Unable to list lectures for unit " + unit.toString(), e);
+		}
+		Log.debug("User {} listed lectures that unit {} is part of", userProvider.get().me(), unit.toString());
+		return lectures;
+	}
+	
+	private static final Logger Log = LoggerFactory.getLogger(LectureManager.class);
 
 	private final Provider<UserManager> userProvider;
 	private final Provider<UnitManager> unitProvider;

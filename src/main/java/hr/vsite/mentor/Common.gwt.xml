@@ -15,6 +15,7 @@
 		<include name="Unit.java"/>
 		<include name="TextUnit.java"/>
 		<include name="VideoUnit.java"/>
+		<include name="ImageUnit.java"/>
 	</source>
 
 	<source path="user">

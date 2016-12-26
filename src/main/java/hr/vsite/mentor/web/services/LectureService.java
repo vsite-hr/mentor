@@ -14,6 +14,7 @@ import org.fusesource.restygwt.client.RestService;
 import com.google.gwt.http.client.Request;
 
 import hr.vsite.mentor.lecture.Lecture;
+import hr.vsite.mentor.unit.Unit;
 
 public interface LectureService extends RestService {
 
@@ -30,16 +31,16 @@ public interface LectureService extends RestService {
 	@Path("{lecture}")
 	public Request findById(@PathParam("lecture") UUID lectureId, MethodCallback<Lecture> callback);
 
-//	@GET
-//	@Path("{client}/roads")
-//	public Request roads(@PathParam("client") String clientMark, MethodCallback<Set<Road>> callback);
-//
-//	@GET
-//	@Path("{client}/counties")
-//	public Request counties(@PathParam("client") String clientMark, MethodCallback<Set<County>> callback);
-//
-//	@GET
-//	@Path("{client}/sectionSignProgressReport")
-//	public Request sectionSignProgressReport(@PathParam("client") String clientMark, MethodCallback<SectionSignProgressReport> callback);
+	@GET
+	@Path("{lecture}/head")
+	public Request getHeadUnit(@PathParam("lecture") UUID lectureId, MethodCallback<Unit> callback);
+
+	@GET
+	@Path("{lecture}/units")
+	public Request getUnits(@PathParam("lecture") UUID lectureId, MethodCallback<List<Unit>> callback);
+
+	@GET
+	@Path("{lecture}/units/count")
+	public Request getUnitsCount(@PathParam("lecture") UUID lectureId, MethodCallback<Integer> callback);
 
 }

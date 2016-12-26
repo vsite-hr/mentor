@@ -1,5 +1,8 @@
 package hr.vsite.mentor.web.widgets;
 
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
@@ -19,6 +22,7 @@ import hr.vsite.mentor.course.Course;
 import hr.vsite.mentor.lecture.Lecture;
 import hr.vsite.mentor.web.Places;
 import hr.vsite.mentor.web.places.LecturePlace;
+import hr.vsite.mentor.web.services.Api;
 
 public class LectureCard extends MaterialCard {
 
@@ -75,12 +79,25 @@ public class LectureCard extends MaterialCard {
 		
 		String lectureHref = "#" + Places.mapper().getToken(new LecturePlace(course.getId(), lecture.getId()));
 		
-		image.setUrl("https://www.vsite.hr/sites/default/files/promocija2015_027.JPG");	// TODO
+		image.setUrl(GWT.getHostPageBaseURL() + "api/lectures/" + lecture.getId() + "/thumbnail");
 		title.setText(lecture.getTitle());
 		title.setHref(lectureHref);
 		description.setText(lecture.getDescription());
-		unitsLink.setText("13 poglavlja");	// TODO
+		unitsLink.setTitle("Učitavam broj poglavlja");
 		unitsLink.setHref(lectureHref);
+		
+		Api.get().lecture().getUnitsCount(lecture.getId(), new MethodCallback<Integer>() {
+			@Override
+			public void onSuccess(Method method, Integer count) {
+				unitsLink.setText(count + " poglavlja");
+				unitsLink.setTitle("");
+			}
+			@Override
+			public void onFailure(Method method, Throwable exception) {
+				unitsLink.setText("<?!?>");
+				unitsLink.setTitle("Pogreška prilikom učitavanja broja poglavlja");
+			}
+		});
 		
 	}
 
