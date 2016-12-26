@@ -6,6 +6,8 @@
 
 		<!-- Writable folder for app's data -->
 		<DataPath>/var/local/mentor/</DataPath>
+		<!-- Google API key -->
+		<GoogleApiKey>InsertAPiKeyHere</GoogleApiKey>
 		
 	</mentor>
 
