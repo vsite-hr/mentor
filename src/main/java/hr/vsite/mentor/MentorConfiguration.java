@@ -37,15 +37,19 @@ public class MentorConfiguration extends XMLConfiguration {
 		dataPath = FileSystems.getDefault().getPath(getString("mentor.DataPath"));
 		Log.info("Data path is {}", dataPath);
 
+		youtubeApiKey = FileSystems.getDefault().getPath(getString("mentor.GoogleApiKey"));
+		Log.info("YouTube APi Key loaded!");
 	}
 
 	public Path getDataPath() { return dataPath; }
 	public Path getSubDataPath(String subfolder) { return dataPath.resolve(subfolder); }
+	public Path getYoutubeApiKey() {return youtubeApiKey;}
 	
     private static final Logger Log = LoggerFactory.getLogger(MentorConfiguration.class);
 	private static final long serialVersionUID = 1L;
 	private static MentorConfiguration instance = null;
 	
     private final Path dataPath;
+    private final Path youtubeApiKey;
 
 }
