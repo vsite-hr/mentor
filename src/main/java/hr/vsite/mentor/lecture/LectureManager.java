@@ -268,12 +268,11 @@ public class LectureManager {
 			throw new RuntimeException("Delete failed: " + e.getMessage());
 		}
 		finally{
-			if(statement != null)
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					throw new RuntimeException("Delete failed: " + e.getMessage());
-				}
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				throw new RuntimeException(e.getMessage());
+			}
 		}
 
 		return lecture;
